@@ -1,0 +1,6 @@
+<RCC>
+  <qresource>
+    <file>img/circle_green.png</file>
+    <file>img/circle_grey.png</file>
+  </qresource>
+</RCC>
