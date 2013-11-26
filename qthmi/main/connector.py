@@ -113,3 +113,34 @@ class AbstractPLCConnector(QObject, object):
         """
         self.autopoll_timer.stop()
 
+
+class BufferConnector(AbstractPLCConnector):
+    """
+    Connect to other Connectors.
+
+    Buffer Tag values for Plotting or Logging independently from the poll
+    interval of the original Connector. So all processdata can still be
+    collected continuously while some HMIWidgets like plotters or loggers are
+    only refreshed when asked for.
+
+    @type connector: AbstractPLCConnector
+    @ivar connector: data source
+
+    """
+
+    def __init__(self, connector):
+        """
+        @type connector: AbstractPLCConnector
+        @param connector: data source
+
+        """
+        super(BufferConnector, self).__init__()
+        self.connector = connector
+
+    def write_to_plc(self, *args, **kwargs):
+        super(BufferConnector, self).write_to_plc(*args, **kwargs)
+
+    def read_from_plc(self, address, datatype):
+        tag = self.tags[address]
+        primarytag = self.connector.tags[tag.address]
+        return primarytag.value

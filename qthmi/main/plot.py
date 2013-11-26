@@ -78,7 +78,7 @@ class HMIPlot (QWidget, object):
     @ivar connector: connector instance for plc communication
     """
 
-    def __init__(self, connector, parent=None, buffer_size=100):
+    def __init__(self, connector, parent=None, buffer_size=100, autorefresh=True):
         """
         @type connector: qthmi.main.connector.AbstractPLCConnector
 
@@ -100,7 +100,9 @@ class HMIPlot (QWidget, object):
         #----------------------------------------------------
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self.canvas)
-        self.connect(self.connector, SIGNAL("polled()"), self.refresh)
+
+        if autorefresh:
+            self.connect(self.connector, SIGNAL("polled()"), self.refresh)
 
     def add_observer(self, tag, label="", ax=0, style="-"):
         """

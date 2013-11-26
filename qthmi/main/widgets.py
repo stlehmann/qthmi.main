@@ -14,7 +14,13 @@ from input import NumPad
 from qthmi.main.connector import abstractmethod
 from resources_rc import *
 
+
 class HMIObject(QObject):
+    """
+    Basic HMI class
+
+    """
+
     def __init__(self, tag=None, parent=None):
         super(HMIObject, self).__init__(parent)
         self.tag = tag
@@ -29,6 +35,11 @@ class HMIObject(QObject):
 
 
 class HMIWidget(HMIObject, QWidget):
+    """
+    Basic HMI Widget class
+
+    """
+
     def __init__(self, tag=None, parent=None):
         HMIObject.__init__(self, tag, parent)
         QWidget.__init__(self, parent)
