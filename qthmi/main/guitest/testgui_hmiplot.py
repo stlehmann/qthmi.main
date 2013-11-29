@@ -1,14 +1,13 @@
 from PyQt4.QtGui import QApplication
-from matplotlib.axes import Axes
 import pylab
 import sys
-from qthmi.ads import ADSConnector
 from qthmi.main.plot import HMIPlot, Observer, Observer
 
 __author__ = 'Stefan Lehmann'
 
 
-from qthmi.main.connector import AbstractPLCConnector, Tag
+from qthmi.main.connector import AbstractPLCConnector
+from qthmi.main.tag import Tag
 
 
 class TestConnector(AbstractPLCConnector):
@@ -51,11 +50,12 @@ connector.add_tag(Tag("Signal 2", 2000))
 connector.start_autopoll(100)
 
 hmi_plot = HMIPlot(connector)
-hmi_plot.add_observer(Observer(connector.tags["Signal 1"], 50))
-hmi_plot.add_observer(Observer(connector.tags["Signal 2"], 100))
+hmi_plot.add_observer(connector.tags["Signal 1"], 50)
+hmi_plot.add_observer(connector.tags["Signal 2"], 100)
 hmi_plot.delta_x = 100
-hmi_plot.axes.legend(("Test", "Test2"))
-hmi_plot.axes.set_ylim(-5, 5)
-hmi_plot.axes.grid(True)
+hmi_plot.fig.autofmt_xdate()
+hmi_plot.axes[0].legend(("Test", "Test2"))
+hmi_plot.axes[0].set_ylim(-5, 5)
+hmi_plot.axes[0].grid(True)
 hmi_plot.show()
 app.exec_()

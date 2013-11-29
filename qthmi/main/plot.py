@@ -31,10 +31,12 @@ The HMIPlot object is inherited from C{QWidget} and can be displayed on its own
 by calling the C{show()} function or embedded in a second QWidget object.
 
 """
+from datetime import datetime
+
 __author__ = "Stefan Lehmann"
 
 
-import datetime
+import time
 import pylab
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QWidget, QVBoxLayout
@@ -57,9 +59,10 @@ class Observer(HMIWidget):
         self.label = tag.name if label == "" else label
         self.ax = ax
         self.style = style
+        self.starttime = None
 
     def read_value_from_tag(self):
-        self.x.append(datetime.datetime.now())
+        self.x.append(datetime.now())
         self.y.append(self.tag.value)
 
         if len(self.x) > self.buffer_size:
@@ -70,6 +73,20 @@ class Observer(HMIWidget):
         pass
 
 
+class TimeDeltaObserver(Observer):
+    def read_value_from_tag(self):
+        if len(self.x) == 0:
+            self.starttime = datetime.now()
+
+        delta = datetime.now() - self.starttime
+        self.x.append(delta.total_seconds())
+        self.y.append(self.tag.value)
+
+        if len(self.x) > self.buffer_size:
+            self.x = self.x[-self.buffer_size:]
+            self.y = self.y[-self.buffer_size:]
+
+
 class HMIPlot (QWidget, object):
     """
     Realtime Plot
@@ -78,7 +95,7 @@ class HMIPlot (QWidget, object):
     @ivar connector: connector instance for plc communication
     """
 
-    def __init__(self, connector, parent=None, buffer_size=100, autorefresh=True):
+    def __init__(self, connector, parent=None, buffer_size=100):
         """
         @type connector: qthmi.main.connector.AbstractPLCConnector
 
@@ -101,31 +118,36 @@ class HMIPlot (QWidget, object):
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self.canvas)
 
-        if autorefresh:
-            self.connect(self.connector, SIGNAL("polled()"), self.refresh)
+        self.connect(self.connector, SIGNAL("polled()"), self.refresh)
 
-    def add_observer(self, tag, label="", ax=0, style="-"):
+    def add_observer(self, observer):
         """
         Add observer to HMIPlot.
         @type observer: Observer
 
         """
-        observer = Observer(tag, self.buffer_size, label, ax, style)
         self.observers.append(observer)
 
         self.lines.append(
-            self.axes[ax].plot([], [], observer.style, label=observer.label)[0])
+            self.axes[observer.ax].plot([], [], observer.style,
+                                                label=observer.label)[0])
+
+    def autoscale_xaxis(self):
+        self.axes[0].set_xlim(
+            datetime.datetime.now() - datetime.timedelta(
+                milliseconds=self.buffer_size * self.connector.cycletime),
+            datetime.datetime.now()
+        )
 
     def refresh(self):
         """
         Plot current data.
 
         """
-        self.axes[0].set_xlim(
-            datetime.datetime.now() - datetime.timedelta(
-                milliseconds=self.buffer_size * self.connector.cycletime),
-            datetime.datetime.now()
-        )
+
+        prim_observer = self.observers[0]
+        if len(prim_observer.x) > 1:
+            self.axes[0].set_xlim(prim_observer.x[0], prim_observer.x[-1])
 
         for i, observer in enumerate(self.observers):
             observer.read_value_from_tag()
