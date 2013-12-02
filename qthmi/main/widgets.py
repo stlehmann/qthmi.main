@@ -8,7 +8,7 @@ __author__ = "Stefan Lehmann"
 
 
 from PyQt4.QtCore import QEvent, SIGNAL, QObject
-from PyQt4.QtGui import QDoubleSpinBox, QDialog, QLabel, QComboBox, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QPixmap, QPicture
+from PyQt4.QtGui import QDoubleSpinBox, QDialog, QLabel, QComboBox, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QPixmap, QPicture, QSpinBox
 
 from input import NumPad
 from qthmi.main.connector import abstractmethod
@@ -43,6 +43,38 @@ class HMIWidget(HMIObject, QWidget):
     def __init__(self, tag=None, parent=None):
         HMIObject.__init__(self, tag, parent)
         QWidget.__init__(self, parent)
+
+
+class HMISpinBox(QSpinBox, HMIObject):
+    def __init__(self, tag=None, parent=None):
+        super(HMISpinBox, self).__init__(tag, parent)
+        self.lineEdit().installEventFilter(self)
+        self.setButtonSymbols(QDoubleSpinBox.NoButtons)
+        if tag is not None:
+            self.connect(self.tag, SIGNAL("value_changed()"),
+                         self.read_value_from_tag)
+            self.connect(self, SIGNAL("valueChanged(double)"),
+                         self.write_value_to_tag)
+
+    def eventFilter(self, *args, **kwargs):
+        sender = args[0]
+        event = args[1]
+
+        if event.type() == QEvent.MouseButtonPress:
+            if self.isEnabled() and not self.isReadOnly():
+                numpad = NumPad(self, sender.text())
+                if numpad.exec_() == QDialog.Accepted:
+                    (newValue, b) = numpad.outputLineEdit.text().toDouble()
+                    if b:
+                        self.setValue(newValue)
+
+        return QDoubleSpinBox.eventFilter(self, *args, **kwargs)
+
+    def read_value_from_tag(self):
+        self.setValue(self.tag.value)
+
+    def write_value_to_tag(self):
+        self.tag.value = self.value()
 
 
 class HMIDoubleSpinBox(QDoubleSpinBox, HMIObject):
