@@ -5,7 +5,7 @@ __author__ = 'Stefan Lehmann'
 
 
 from PyQt4.QtCore import QObject, SIGNAL, QTimer
-
+from util import timeit
 
 class ConnectionError(Exception):
     pass

@@ -152,4 +152,6 @@ class HMIPlot (QWidget, object):
         for i, observer in enumerate(self.observers):
             observer.read_value_from_tag()
             self.lines[i].set_data(observer.x, observer.y)
-            self.canvas.draw()
+
+    def draw(self):
+        self.canvas.draw()
