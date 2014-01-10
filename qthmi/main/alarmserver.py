@@ -293,6 +293,26 @@ class AlarmWord(HMIObject):
         HMIObject.write_value_to_tag(self)
 
 
+class HMIAckWord(HMIObject):
+
+    def __init__(self, tag):
+        HMIObject.__init__(self, tag)
+        self.value = 0
+        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+
+    def read_value_from_tag(self):
+        self.value = self.tag.value
+
+    def write_value_to_tag(self):
+        self.tag.value = self.value
+
+    def set_bit(self, n):
+        self.value |= 1 << n
+
+    def reset_bit(self, n):
+        self.value &= ~(1 << n)
+
+
 def bit_value(value, n):
     """
     Return value of bit n of value
