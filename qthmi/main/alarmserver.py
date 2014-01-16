@@ -297,8 +297,17 @@ class HMIAckWord(HMIObject):
 
     def __init__(self, tag):
         HMIObject.__init__(self, tag)
-        self.value = 0
+        self._value = 0
         self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, val):
+        self._value = val
+        self.write_value_to_tag()
 
     def read_value_from_tag(self):
         self.value = self.tag.value

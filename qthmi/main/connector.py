@@ -59,7 +59,6 @@ class AbstractPLCConnector(QObject, object):
         """
         self.tags.pop(tag_name)
 
-    @timeit
     def poll(self):
         """
         Exchange data with PLC.
