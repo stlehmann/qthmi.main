@@ -8,20 +8,20 @@ class Tag(QObject, object):
     """
     An instance of Tag represents a buffered connection between GUI and PLC
 
-    @type name: str
-    @ivar name: tag name
+    :type name: str
+    :ivar name: tag name
 
-    @ivar address: PLC memory address
+    :ivar address: PLC memory address
 
-    @type datatype: type
-    @ivar datatype: python datatype
+    :type datatype: type
+    :ivar datatype: python datatype
 
-    @type dirty: bool
-    @ivar dirty: is set if the tag value has been changed
+    :type dirty: bool
+    :ivar dirty: is set if the tag value has been changed
 
-    @ivar plc_datatype: identifier for the datatype the data is stored in the PLC
+    :ivar plc_datatype: identifier for the datatype the data is stored in the PLC
 
-    @ivar raw_value: the raw PLC value
+    :ivar raw_value: the raw PLC value
     """
 
     def __init__(self, name, address, plc_datatype=None, datatype=float):
@@ -76,11 +76,11 @@ class ScaledTag(Tag):
         >>> tag.value
         25.0
 
-    @type scale: numeric value
-    @ivar scale: factor for scaling the raw_value
+    :type scale: numeric value
+    :ivar scale: factor for scaling the raw_value
 
-    @type offset: numeric value
-    @ivar offset: offset added to the raw_value
+    :type offset: numeric value
+    :ivar offset: offset added to the raw_value
 
     """
 
@@ -124,10 +124,10 @@ class TextTag(Tag):
         """
         Add a text message definition
 
-        @param key: Tag value as key
+        :param key: Tag value as key
 
-        @type text: basestring
-        @param text: text message
+        :type text: basestring
+        :param text: text message
 
         """
         self.text_definitions[key] = text
@@ -136,8 +136,8 @@ class TextTag(Tag):
         """
         Remove text message for the given key.
 
-        @param key: Tag value as key
-        @return: text message
+        :param key: Tag value as key
+        :return: text message
         """
         return self.text_definitions.pop(key)
 

@@ -100,8 +100,8 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
 
     def data(self, index, role=Qt.DisplayRole):
         """
-        @type index: Gui.QtCore.QModelIndex
-        @param role: int
+        :type index: Gui.QtCore.QModelIndex
+        :param role: int
 
         """
 

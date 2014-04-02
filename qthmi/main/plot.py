@@ -91,13 +91,13 @@ class HMIPlot (QWidget, object):
     """
     Realtime Plot
 
-    @type connector: connector.PLCConnector
-    @ivar connector: connector instance for plc communication
+    :type connector: connector.PLCConnector
+    :ivar connector: connector instance for plc communication
     """
 
     def __init__(self, connector, parent=None, buffer_size=100):
         """
-        @type connector: qthmi.main.connector.AbstractPLCConnector
+        :type connector: qthmi.main.connector.AbstractPLCConnector
 
         """
         super(HMIPlot, self).__init__(parent)
@@ -123,7 +123,7 @@ class HMIPlot (QWidget, object):
     def add_observer(self, observer):
         """
         Add observer to HMIPlot.
-        @type observer: Observer
+        :type observer: Observer
 
         """
         self.observers.append(observer)

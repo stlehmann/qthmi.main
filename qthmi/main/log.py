@@ -9,11 +9,11 @@ from widgets import HMIObject
 class CSVWriter(HMIObject):
     """
     Write Tag values in CSV files.
-    @type tags: list(Tag)
-    @ivar tags: connected Tag objects
+    :type tags: list(Tag)
+    :ivar tags: connected Tag objects
 
-    @type dialect: csv.Dialect
-    @ivar dialect: Dialect for CSV output
+    :type dialect: csv.Dialect
+    :ivar dialect: Dialect for CSV output
 
     """
 

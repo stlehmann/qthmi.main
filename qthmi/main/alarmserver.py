@@ -14,16 +14,14 @@ The following features are provided:
 In addition to the basic AlarmServer class there is an AlarmServerModel
 class which implements the model/view pattern used by the Qt framework.
 So this class can be used as a model for QTableView or QListView.
+
 """
+
+from datetime import datetime
 from PyQt4.QtCore import SIGNAL
 from qthmi.main.widgets import HMIObject
 
 __author__ = "Stefan Lehmann"
-
-
-from datetime import datetime
-
-
 SIGNAL_ALARM_RAISED = "alarmRaised(int, QString)"
 BIT_COUNT = 16
 
@@ -36,29 +34,16 @@ class Alarm():
     """
     An instance of this class represents a defined or active alarm.
 
-    @ivar alarm_nr: unique alarm number, used as key value
-    @type alarm_nr: int
+    :ivar int alarm_nr: unique alarm number, used as key value
+    :ivar basestring text: alarm text
+    :ivar datetime time_coming: time the alarm started
+    :ivar datetime time_going: time the alarm finished
+    :ivar datetime time_acknowledged: time when alarm got acknowledged by the
+        user
+    :ivar int counter: number of times the alarm has been raised since active
+    :ivar bool is_acknowledged: shows if the alarm has been acknowledged
+    :ivar bool is_active: shows if the alarm is currently active
 
-    @ivar text: alarm text
-    @type text: basestring
-
-    @ivar time_coming: time the alarm started
-    @type time_coming: datetime
-
-    @ivar time_going: time the alarm finished
-    @type time_going: datetime
-
-    @ivar time_acknowledged: time when alarm got acknowledged by the user
-    @type time_acknowledged: datetime
-
-    @ivar counter: number of times the alarm has been raised since active
-    @type counter: int
-
-    @ivar is_acknowledged: shows if the alarm has been acknowledged
-    @type is_acknowledged: bool
-
-    @ivar is_active: shows if the alarm is currently active
-    @type is_active: bool
     """
     def __init__(self, alarm_nr, text):
         self.alarm_nr = alarm_nr
@@ -75,7 +60,8 @@ class Alarm():
 
     def acknowledge(self):
         """
-        Acknowledge the alarm by setting time_acknowledge and the acknowledged property.
+        Acknowledge the alarm by setting time_acknowledge and the
+        acknowledged property.
 
         """
         self.time_acknowledged = datetime.now()
@@ -83,7 +69,8 @@ class Alarm():
 
     def clear(self):
         """
-        Clear the alarm by setting back all instance variables to the init values.
+        Clear the alarm by setting back all instance variables
+        to the init values.
 
         """
         self.time_coming = None
@@ -96,13 +83,11 @@ class Alarm():
 
 class AlarmServer():
     """
-    An alarm server with the possibility to define alarms, raise, acknowledge and clear them.
+    An alarm server with the possibility to define alarms,
+    raise, acknowledge and clear them.
 
-    @ivar current_alarms: list of current alarms
-    @type current_alarms: list
-
-    @ivar defined_alarms: dictionary of all defined alarms, key is the alarm number
-    @type defined_alarms: dict
+    :ivar list current_alarms: list of current alarms
+    :ivar dict defined_alarms: dictionary of all defined alarms, key is the alarm number
 
     """
     def __init__(self):
@@ -112,7 +97,7 @@ class AlarmServer():
     def acknowledge(self, alarm_nr):
         """
         Acknowledge a specific alarm identified via alarm_nr.
-        @type alarm_nr: int
+        :param int alarm_nr: alarm identifiert
 
         """
         active_alarm = self.defined_alarms.get(alarm_nr)
@@ -138,7 +123,7 @@ class AlarmServer():
         The C{time_coming} attribute is set to the current time
         if the alarm has been inactive.
 
-        @type alarm_nr: int
+        :param int alarm_nr: alarm identifier
 
         """
         alarm = self.defined_alarms.get(alarm_nr)
@@ -164,7 +149,7 @@ class AlarmServer():
         The C{time_going} attribute is set to the current time
         if the alarm has been active.
 
-        @type alarm_nr: int
+        :param int alarm_nr: alarm identifier
 
         """
         alarm = self.defined_alarms.get(alarm_nr)
@@ -182,7 +167,7 @@ class AlarmServer():
         current alarms. All instance variables will be set to
         their initial value.
 
-        @type alarm_nr: int
+        :param int alarm_nr: alarm identifier
 
         """
         active_alarm = self.defined_alarms.get(alarm_nr)
@@ -203,11 +188,8 @@ class AlarmServer():
         """
         Define a new alarm and add it to the list C{defined_alarms}.
 
-        @type alarm_nr: int
-        @param alarm_nr: key value for accessing the alarm
-
-        @type alarm_text: basestring
-        @param alarm_text: text describing the alarm
+        :param int alarm_nr: key value for accessing the alarm
+        :param basestring alarm_text: text describing the alarm
 
         """
         alarm = Alarm(alarm_nr, alarm_text)
@@ -218,7 +200,7 @@ class AlarmServer():
         """
         list of all unacknowledged alarms
 
-        @rtype: list
+        :rtype: list
 
         """
         retVal = []
@@ -232,20 +214,17 @@ class AlarmWord(HMIObject):
     """
     Hold the value of an alarm word and raise alarms for each alarm bit.
 
-    @type alarmserver: AlarmServer
-    @ivar alarmserver: alarm server with the define alarms
-
-    @type offset: int
-    @ivar offset: offset added to the alarm number
+    :ivar qthmi.main.Alarmserver alarmserver: alarm server with the defined
+        alarms
+    :ivar int offset: offset added to the alarm number
 
     """
 
     def __init__(self, tag, alarmserver, offset=0):
         """
-        @type alarmserver: AlarmServer
-
-        @type offset: int
-        @param offset: offset added to the alarm number
+        :param qthmi.main.Alarmserver alarmserver: alarm server with the defined
+            alarms
+        :param int offset: offset added to the alarm number
 
         """
         HMIObject.__init__(self, tag)
@@ -298,7 +277,8 @@ class HMIAckWord(HMIObject):
     def __init__(self, tag):
         HMIObject.__init__(self, tag)
         self._value = 0
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+        self.connect(self.tag, SIGNAL("value_changed()"),
+                     self.read_value_from_tag)
 
     @property
     def value(self):
@@ -326,11 +306,10 @@ def bit_value(value, n):
     """
     Return value of bit n of value
 
-    @type n: int
-    @param n: bit number, starting with 0
+    :param int n: bit number, starting with 0
 
-    @rtype: bool
-    @return: value of bit n
+    :rtype: bool
+    :return: value of bit n
 
     """
     return ((value >> n) & 1) == 1

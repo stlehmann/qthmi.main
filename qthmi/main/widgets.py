@@ -178,11 +178,11 @@ class HMITextMapper(HMIObject):
     """
     Map text messages to keys.
 
-    @type text_definitions: dict
-    @ivar text_definitions: defined pairs of numeric values and text messages
+    :type text_definitions: dict
+    :ivar text_definitions: defined pairs of numeric values and text messages
 
-    @type text: basestring
-    @ivar text: Corresponding text message to the current tag value. Empty if no text for the given
+    :type text: basestring
+    :ivar text: Corresponding text message to the current tag value. Empty if no text for the given
                 key is defined.
 
     """
@@ -198,10 +198,10 @@ class HMITextMapper(HMIObject):
         """
         Add a text message definition
 
-        @param key: Tag value as key
+        :param key: Tag value as key
 
-        @type text: basestring
-        @param text: text message
+        :type text: basestring
+        :param text: text message
 
         """
         self.text_definitions[key] = text
@@ -210,8 +210,8 @@ class HMITextMapper(HMIObject):
         """
         Remove text message for the given key.
 
-        @param key: Tag value as key
-        @return: text message
+        :param key: Tag value as key
+        :return: text message
         """
         return self.text_definitions.pop(key)
 

@@ -11,9 +11,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   usage/index
-   modules/index
-   
+   main
+   modules
+   usage
+
 
 
 Indices and tables
