@@ -18,6 +18,7 @@ ALARM_TIME_GOING = 4
 COLUMN_COUNT = 5
 TIME_PATTERN = "%H:%M:%S"
 
+
 class AlarmServerModel(QAbstractTableModel, AlarmServer):
     """
     This class allows the user access to the alarm server via
@@ -39,11 +40,13 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             row = self.current_alarms.index(alarm)
             indexTopLeft = self.index(row, 0, QModelIndex())
             indexBottomRight = self.index(row, COLUMN_COUNT - 1, QModelIndex())
-            self.emit(SIGNAL("dataChanged(QModelIndex, QModelIndex)"), indexTopLeft, indexBottomRight)
+            self.emit(SIGNAL("dataChanged(QModelIndex, QModelIndex)"),
+                      indexTopLeft, indexBottomRight)
 
     def acknowledge(self, alarm_nr):
         """
-        Acknowledge the current alarm with the given number and emit a signal 'alarm_acknowledged'
+        Acknowledge the current alarm with the given number
+        and emit a signal 'alarm_acknowledged'
 
         """
 
@@ -52,6 +55,11 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
         self.emit(SIGNAL("alarm_acknowledged(int)"), alarm_nr)
 
     def acknowledge_all(self):
+        """
+        Acknowledge all current alarms.
+
+        """
+
         self.beginResetModel()
         for alarm in self.current_alarms:
             self.acknowledge(alarm.alarm_nr)
@@ -68,10 +76,13 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             indexTopLeft = self.index(row, 0, QModelIndex())
             indexBottomRight = self.index(row, COLUMN_COUNT - 1, QModelIndex())
 
-            self.emit(SIGNAL("dataChanged(QModelIndex, QModelIndex)"), indexTopLeft, indexBottomRight)
+            self.emit(SIGNAL("dataChanged(QModelIndex, QModelIndex)"),
+                      indexTopLeft, indexBottomRight)
         else:
             alarm_count = len(self.current_alarms)
-            self.beginInsertRows(QModelIndex(), alarm_count - 1, alarm_count - 1)
+            self.beginInsertRows(
+                QModelIndex(), alarm_count - 1, alarm_count - 1
+            )
             AlarmServer.alarm_coming(self, alarm_nr)
             self.endInsertRows()
 
@@ -80,6 +91,12 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
         self._dataChanged_signal(alarm_nr)
 
     def clear(self, alarm_nr):
+        """
+        Clear the current alarm.
+        
+        :param int alarm_nr: number of the alarm
+        
+        """
         alarm = self.defined_alarms.get(alarm_nr)
         if alarm is None:
             raise AlarmNotDefinedError(alarm_nr)
@@ -91,6 +108,10 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             self.endRemoveRows()
 
     def clear_all(self):
+        """
+        Clear all current alarms.
+        
+        """
         self.beginResetModel()
         AlarmServer.clear_all(self)
         self.endResetModel()
@@ -99,12 +120,6 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
         return COLUMN_COUNT
 
     def data(self, index, role=Qt.DisplayRole):
-        """
-        :type index: Gui.QtCore.QModelIndex
-        :param role: int
-
-        """
-
         if not index.isValid() or \
                 not (0 <= index.row() < len(self.current_alarms)):
             return QVariant
@@ -156,4 +171,3 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
 
     def rowCount(self, index=QModelIndex()):
         return len(self.current_alarms)
-

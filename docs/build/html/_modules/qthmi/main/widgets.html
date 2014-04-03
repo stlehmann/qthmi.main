@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>qthmi.main.widgets &mdash; qthmi.main 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="qthmi.main 0.2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for qthmi.main.widgets</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Access PLC values via common GUI objects</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.qt4_editor.formlayout</span> <span class="kn">import</span> <span class="n">QLineEdit</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Stefan Lehmann&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">QEvent</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">,</span> <span class="n">QObject</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="n">QDoubleSpinBox</span><span class="p">,</span> <span class="n">QDialog</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QComboBox</span><span class="p">,</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QPicture</span><span class="p">,</span> <span class="n">QSpinBox</span>
+
+<span class="kn">from</span> <span class="nn">input</span> <span class="kn">import</span> <span class="n">NumPad</span>
+<span class="kn">from</span> <span class="nn">qthmi.main.connector</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">resources_rc</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="HMIObject"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIObject">[docs]</a><span class="k">class</span> <span class="nc">HMIObject</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basic HMI class</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMIObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="HMIObject.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIObject.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="HMIObject.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIObject.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</div></div>
+<div class="viewcode-block" id="HMIWidget"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIWidget">[docs]</a><span class="k">class</span> <span class="nc">HMIWidget</span><span class="p">(</span><span class="n">HMIObject</span><span class="p">,</span> <span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basic HMI Widget class</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">HMIObject</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="HMISpinBox"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMISpinBox">[docs]</a><span class="k">class</span> <span class="nc">HMISpinBox</span><span class="p">(</span><span class="n">QSpinBox</span><span class="p">,</span> <span class="n">HMIObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMISpinBox</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit</span><span class="p">()</span><span class="o">.</span><span class="n">installEventFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setButtonSymbols</span><span class="p">(</span><span class="n">QDoubleSpinBox</span><span class="o">.</span><span class="n">NoButtons</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;valueChanged(double)&quot;</span><span class="p">),</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">write_value_to_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HMISpinBox.eventFilter"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMISpinBox.eventFilter">[docs]</a>    <span class="k">def</span> <span class="nf">eventFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">sender</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">QEvent</span><span class="o">.</span><span class="n">MouseButtonPress</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isEnabled</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isReadOnly</span><span class="p">():</span>
+                <span class="n">numpad</span> <span class="o">=</span> <span class="n">NumPad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">numpad</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+                    <span class="p">(</span><span class="n">newValue</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="n">numpad</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">toDouble</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">b</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">newValue</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">QDoubleSpinBox</span><span class="o">.</span><span class="n">eventFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMISpinBox.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMISpinBox.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMISpinBox.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMISpinBox.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+</div></div>
+<div class="viewcode-block" id="HMIDoubleSpinBox"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIDoubleSpinBox">[docs]</a><span class="k">class</span> <span class="nc">HMIDoubleSpinBox</span><span class="p">(</span><span class="n">QDoubleSpinBox</span><span class="p">,</span> <span class="n">HMIObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMIDoubleSpinBox</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineEdit</span><span class="p">()</span><span class="o">.</span><span class="n">installEventFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setButtonSymbols</span><span class="p">(</span><span class="n">QDoubleSpinBox</span><span class="o">.</span><span class="n">NoButtons</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;valueChanged(double)&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_value_to_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HMIDoubleSpinBox.eventFilter"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIDoubleSpinBox.eventFilter">[docs]</a>    <span class="k">def</span> <span class="nf">eventFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">sender</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">QEvent</span><span class="o">.</span><span class="n">MouseButtonPress</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isEnabled</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isReadOnly</span><span class="p">():</span>
+                <span class="n">numpad</span> <span class="o">=</span> <span class="n">NumPad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">numpad</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+                    <span class="p">(</span><span class="n">newValue</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="n">numpad</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">toDouble</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">b</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">newValue</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">QDoubleSpinBox</span><span class="o">.</span><span class="n">eventFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMIDoubleSpinBox.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIDoubleSpinBox.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMIDoubleSpinBox.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIDoubleSpinBox.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+</div></div>
+<div class="viewcode-block" id="HMIComboBox"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIComboBox">[docs]</a><span class="k">class</span> <span class="nc">HMIComboBox</span><span class="p">(</span><span class="n">QComboBox</span><span class="p">,</span> <span class="n">HMIObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMIComboBox</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;currentIndexChanged(int)&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_value_to_tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index_changed_first_time</span> <span class="o">=</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="HMIComboBox.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIComboBox.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMIComboBox.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIComboBox.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_changed_first_time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index_changed_first_time</span> <span class="o">=</span> <span class="bp">False</span>
+
+</div></div>
+<div class="viewcode-block" id="HMILabel"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMILabel">[docs]</a><span class="k">class</span> <span class="nc">HMILabel</span><span class="p">(</span><span class="n">QLabel</span><span class="p">,</span> <span class="n">HMIObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">format_spec</span><span class="o">=</span><span class="s">&quot;{:03.3f}&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMILabel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_spec</span> <span class="o">=</span> <span class="n">format_spec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HMILabel.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMILabel.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_spec</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="HMILabel.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMILabel.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+</div></div>
+<div class="viewcode-block" id="HMILineEdit"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMILineEdit">[docs]</a><span class="k">class</span> <span class="nc">HMILineEdit</span><span class="p">(</span><span class="n">QLineEdit</span><span class="p">,</span> <span class="n">HMIObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMILineEdit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;textEdited(QString)&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_value_to_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HMILineEdit.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMILineEdit.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMILineEdit.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMILineEdit.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+
+</div></div>
+<div class="viewcode-block" id="HMIPushButton"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIPushButton">[docs]</a><span class="k">class</span> <span class="nc">HMIPushButton</span><span class="p">(</span><span class="n">QPushButton</span><span class="p">,</span> <span class="n">HMIObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMIPushButton</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+        <span class="n">QPushButton</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;toggled(bool)&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_value_to_tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkable</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_time_uncheck</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="HMIPushButton.setCheckable"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIPushButton.setCheckable">[docs]</a>    <span class="k">def</span> <span class="nf">setCheckable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkable</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+<div class="viewcode-block" id="HMIPushButton.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIPushButton.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMIPushButton.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIPushButton.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>
+
+</div></div>
+<div class="viewcode-block" id="HMITextMapper"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMITextMapper">[docs]</a><span class="k">class</span> <span class="nc">HMITextMapper</span><span class="p">(</span><span class="n">HMIObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Map text messages to keys.</span>
+
+<span class="sd">    :type text_definitions: dict</span>
+<span class="sd">    :ivar text_definitions: defined pairs of numeric values and text messages</span>
+
+<span class="sd">    :type text: basestring</span>
+<span class="sd">    :ivar text: Corresponding text message to the current tag value. Empty if no text for the given</span>
+<span class="sd">                key is defined.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMITextMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_definitions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HMITextMapper.add_text"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMITextMapper.add_text">[docs]</a>    <span class="k">def</span> <span class="nf">add_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a text message definition</span>
+
+<span class="sd">        :param key: Tag value as key</span>
+
+<span class="sd">        :type text: basestring</span>
+<span class="sd">        :param text: text message</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_definitions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
+</div>
+<div class="viewcode-block" id="HMITextMapper.pop_text"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMITextMapper.pop_text">[docs]</a>    <span class="k">def</span> <span class="nf">pop_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove text message for the given key.</span>
+
+<span class="sd">        :param key: Tag value as key</span>
+<span class="sd">        :return: text message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_definitions</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMITextMapper.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMITextMapper.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="HMITextMapper.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMITextMapper.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_definitions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
+
+</div></div>
+<div class="viewcode-block" id="HMIIndicator"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIIndicator">[docs]</a><span class="k">class</span> <span class="nc">HMIIndicator</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span> <span class="n">HMIObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HMIIndicator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+
+        <span class="c">#Indicator images</span>
+        <span class="c">#----------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indicator_on</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="s">&quot;:/img/circle_green.png&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indicator_off</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="s">&quot;:/img/circle_grey.png&quot;</span><span class="p">)</span>
+
+        <span class="c">#Text label</span>
+        <span class="c">#----------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">font</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_label</span><span class="o">.</span><span class="n">font</span><span class="p">()</span>
+        <span class="n">font</span><span class="o">.</span><span class="n">setPointSize</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_label</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
+
+        <span class="c">#Indicator label</span>
+        <span class="c">#----------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indicator_label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indicator_label</span><span class="o">.</span><span class="n">setScaledContents</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indicator_label</span><span class="o">.</span><span class="n">setFixedSize</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indicator_label</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indicator_off</span><span class="p">)</span>
+
+        <span class="c">#Layout</span>
+        <span class="c">#----------------------------------------------------</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indicator_label</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HMIIndicator.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIIndicator.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indicator_label</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indicator_on</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indicator_label</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indicator_off</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HMIIndicator.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIIndicator.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="HMIIndicator.setText"><a class="viewcode-back" href="../../../main.html#qthmi.main.widgets.HMIIndicator.setText">[docs]</a>    <span class="k">def</span> <span class="nf">setText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Stefan Lehmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

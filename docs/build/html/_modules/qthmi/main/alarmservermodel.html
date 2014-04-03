@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>qthmi.main.alarmservermodel &mdash; qthmi.main 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="qthmi.main 0.2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for qthmi.main.alarmservermodel</h1><div class="highlight"><pre>
+<span class="c">#-*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Model for alarm handling</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Stefan Lehmann&quot;</span>
+
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="n">QColor</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">QAbstractTableModel</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QVariant</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">,</span> <span class="n">SIGNAL</span>
+<span class="kn">from</span> <span class="nn">alarmserver</span> <span class="kn">import</span> <span class="n">AlarmServer</span><span class="p">,</span> <span class="n">AlarmNotDefinedError</span>
+
+<span class="n">ALARM_NR</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ALARM_TEXT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">ALARM_COUNTER</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">ALARM_TIME_COMING</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">ALARM_TIME_GOING</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">COLUMN_COUNT</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">TIME_PATTERN</span> <span class="o">=</span> <span class="s">&quot;%H:%M:%S&quot;</span>
+
+
+<div class="viewcode-block" id="AlarmServerModel"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel">[docs]</a><span class="k">class</span> <span class="nc">AlarmServerModel</span><span class="p">(</span><span class="n">QAbstractTableModel</span><span class="p">,</span> <span class="n">AlarmServer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows the user access to the alarm server via</span>
+<span class="sd">    the model/view mechanism of the Qt framework.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">AlarmServer</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AlarmServerModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_dataChanged_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="n">alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AlarmNotDefinedError</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">alarm</span><span class="p">)</span>
+            <span class="n">indexTopLeft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">())</span>
+            <span class="n">indexBottomRight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">COLUMN_COUNT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;dataChanged(QModelIndex, QModelIndex)&quot;</span><span class="p">),</span>
+                      <span class="n">indexTopLeft</span><span class="p">,</span> <span class="n">indexBottomRight</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AlarmServerModel.acknowledge"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.acknowledge">[docs]</a>    <span class="k">def</span> <span class="nf">acknowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acknowledge the current alarm with the given number</span>
+<span class="sd">        and emit a signal &#39;alarm_acknowledged&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AlarmServer</span><span class="o">.</span><span class="n">acknowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataChanged_signal</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;alarm_acknowledged(int)&quot;</span><span class="p">),</span> <span class="n">alarm_nr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.acknowledge_all"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.acknowledge_all">[docs]</a>    <span class="k">def</span> <span class="nf">acknowledge_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acknowledge all current alarms.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">beginResetModel</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">alarm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acknowledge</span><span class="p">(</span><span class="n">alarm</span><span class="o">.</span><span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endResetModel</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.alarm_coming"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.alarm_coming">[docs]</a>    <span class="k">def</span> <span class="nf">alarm_coming</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="n">alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AlarmNotDefinedError</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">:</span>
+            <span class="n">AlarmServer</span><span class="o">.</span><span class="n">alarm_coming</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">)</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">alarm</span><span class="p">)</span>
+            <span class="n">indexTopLeft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">())</span>
+            <span class="n">indexBottomRight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">COLUMN_COUNT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QModelIndex</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;dataChanged(QModelIndex, QModelIndex)&quot;</span><span class="p">),</span>
+                      <span class="n">indexTopLeft</span><span class="p">,</span> <span class="n">indexBottomRight</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alarm_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beginInsertRows</span><span class="p">(</span>
+                <span class="n">QModelIndex</span><span class="p">(),</span> <span class="n">alarm_count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">alarm_count</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">AlarmServer</span><span class="o">.</span><span class="n">alarm_coming</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endInsertRows</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.alarm_going"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.alarm_going">[docs]</a>    <span class="k">def</span> <span class="nf">alarm_going</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="n">AlarmServer</span><span class="o">.</span><span class="n">alarm_going</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataChanged_signal</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.clear"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear the current alarm.</span>
+<span class="sd">        </span>
+<span class="sd">        :param int alarm_nr: number of the alarm</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AlarmNotDefinedError</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">alarm</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beginRemoveRows</span><span class="p">(</span><span class="n">QModelIndex</span><span class="p">(),</span> <span class="n">row</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">AlarmServer</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endRemoveRows</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.clear_all"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.clear_all">[docs]</a>    <span class="k">def</span> <span class="nf">clear_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear all current alarms.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beginResetModel</span><span class="p">()</span>
+        <span class="n">AlarmServer</span><span class="o">.</span><span class="n">clear_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endResetModel</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.columnCount"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.columnCount">[docs]</a>    <span class="k">def</span> <span class="nf">columnCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">QModelIndex</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="n">COLUMN_COUNT</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.data"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="o">.</span><span class="n">isValid</span><span class="p">()</span> <span class="ow">or</span> \
+                <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">QVariant</span>
+
+        <span class="n">alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span>
+        <span class="n">column</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">column</span> <span class="o">==</span> <span class="n">ALARM_NR</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">alarm</span><span class="o">.</span><span class="n">alarm_nr</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">column</span> <span class="o">==</span> <span class="n">ALARM_TEXT</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">alarm</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">column</span> <span class="o">==</span> <span class="n">ALARM_COUNTER</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">alarm</span><span class="o">.</span><span class="n">counter</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">column</span> <span class="o">==</span> <span class="n">ALARM_TIME_COMING</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">alarm</span><span class="o">.</span><span class="n">time_coming</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIME_PATTERN</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">column</span> <span class="o">==</span> <span class="n">ALARM_TIME_GOING</span><span class="p">:</span>
+                <span class="n">time_going</span> <span class="o">=</span> <span class="n">alarm</span><span class="o">.</span><span class="n">time_going</span>
+                <span class="k">if</span> <span class="n">time_going</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">QVariant</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">alarm</span><span class="o">.</span><span class="n">time_going</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIME_PATTERN</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">TextAlignmentRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignLeft</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignVCenter</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">TextColorRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">alarm</span><span class="o">.</span><span class="n">is_acknowledged</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">darkGreen</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">alarm</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.headerData"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.headerData">[docs]</a>    <span class="k">def</span> <span class="nf">headerData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">TextAlignmentRole</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignLeft</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignVCenter</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">DisplayRole</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Horizontal</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="n">ALARM_NR</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s">&quot;id&quot;</span>
+                <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="n">ALARM_TEXT</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s">&quot;message&quot;</span>
+                <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="n">ALARM_COUNTER</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s">&quot;counter&quot;</span>
+                <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="n">ALARM_TIME_COMING</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s">&quot;time coming&quot;</span>
+                <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="n">ALARM_TIME_GOING</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s">&quot;time going&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">QVariant</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">section</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">QVariant</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AlarmServerModel.rowCount"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmservermodel.AlarmServerModel.rowCount">[docs]</a>    <span class="k">def</span> <span class="nf">rowCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">QModelIndex</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Stefan Lehmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

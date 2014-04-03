@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>qthmi.main.input &mdash; qthmi.main 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="qthmi.main 0.2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for qthmi.main.input</h1><div class="highlight"><pre>
+<span class="c"># -*-coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Widgets for user input via TouchScreen</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Stefan Lehmann&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ui_numpad</span> <span class="kn">import</span> <span class="n">Ui_numPad</span>
+
+
+<span class="n">DECIMAL_SEPARATOR</span> <span class="o">=</span> <span class="s">&quot;,&quot;</span>
+
+
+<div class="viewcode-block" id="NumPad"><a class="viewcode-back" href="../../../main.html#qthmi.main.input.NumPad">[docs]</a><span class="k">class</span> <span class="nc">NumPad</span> <span class="p">(</span><span class="n">QDialog</span><span class="p">,</span> <span class="n">Ui_numPad</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    @summary: Nummernblock, welcher auf dem Bildschirm erscheint. Ermöglicht die Eingabe von Zahlen </span>
+<span class="sd">    auf einem Touchscreen</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">NumPad</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="n">suffixIndex</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">suffixIndex</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">text</span><span class="p">[:</span><span class="n">suffixIndex</span><span class="p">])</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setSelection</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">length</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span>
+                             
+        <span class="n">signalMapper</span> <span class="o">=</span> <span class="n">QSignalMapper</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button0</span><span class="p">,</span> <span class="s">&quot;0&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button1</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button2</span><span class="p">,</span> <span class="s">&quot;2&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button3</span><span class="p">,</span> <span class="s">&quot;3&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button4</span><span class="p">,</span> <span class="s">&quot;4&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button5</span><span class="p">,</span> <span class="s">&quot;5&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button6</span><span class="p">,</span> <span class="s">&quot;6&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button7</span><span class="p">,</span> <span class="s">&quot;7&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button8</span><span class="p">,</span> <span class="s">&quot;8&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button9</span><span class="p">,</span> <span class="s">&quot;9&quot;</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonDecimal</span><span class="p">,</span> <span class="n">DECIMAL_SEPARATOR</span><span class="p">)</span>
+        <span class="n">signalMapper</span><span class="o">.</span><span class="n">setMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonDel</span><span class="p">,</span> <span class="s">&quot;DEL&quot;</span><span class="p">)</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button0</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button1</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button2</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button3</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button4</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button5</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button6</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button7</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button8</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button9</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonDecimal</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonDel</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="n">signalMapper</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="s">&quot;map()&quot;</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">signalMapper</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;mapped(QString)&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">button_pressed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonOK</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonCancel</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;pressed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">focusOutEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit_focusOutEvent</span>
+        
+        <span class="n">doubleValidator</span> <span class="o">=</span> <span class="n">QDoubleValidator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setValidator</span><span class="p">(</span><span class="n">doubleValidator</span><span class="p">)</span>
+           
+<div class="viewcode-block" id="NumPad.button_pressed"><a class="viewcode-back" href="../../../main.html#qthmi.main.input.NumPad.button_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">button_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    
+        <span class="n">cursor_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">cursorPosition</span><span class="p">()</span>
+        
+        <span class="c">#Bei markierten Zeichen diese löschen</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">selectedText</span><span class="p">()</span><span class="o">.</span><span class="n">length</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">cursor_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">selectionStart</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">selectionStart</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">selectedText</span><span class="p">()</span><span class="o">.</span><span class="n">length</span><span class="p">()))</span>
+        
+        <span class="c">#Bei DEL letztes Zeichen löschen</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&quot;DEL&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">cursorPosition</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        
+        <span class="c">#Wenn nicht DEL, dann Zeichen schreiben</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;&gt;</span> <span class="s">&quot;DEL&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">DECIMAL_SEPARATOR</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">DECIMAL_SEPARATOR</span>  <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">cursor_position</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputLineEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">cursor_position</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+                        </div>
+<div class="viewcode-block" id="NumPad.outputLineEdit_focusOutEvent"><a class="viewcode-back" href="../../../main.html#qthmi.main.input.NumPad.outputLineEdit_focusOutEvent">[docs]</a>    <span class="k">def</span> <span class="nf">outputLineEdit_focusOutEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Stefan Lehmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

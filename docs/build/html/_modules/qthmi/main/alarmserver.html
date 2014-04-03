@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>qthmi.main.alarmserver &mdash; qthmi.main 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="qthmi.main 0.2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for qthmi.main.alarmserver</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Handle alarms</span>
+
+<span class="sd">Provides an AlarmServer class which is able to handle</span>
+<span class="sd">alarms. It is intended for HMI software where alarm handling is often</span>
+<span class="sd">necessary.</span>
+
+<span class="sd">The following features are provided:</span>
+<span class="sd">    - defining alarms with numbers and alarm texts</span>
+<span class="sd">    - alarms are handled and identified by their alarm number</span>
+<span class="sd">    - alarms can come and leave</span>
+<span class="sd">    - alarms can be acknowledged and cleared by the user</span>
+
+<span class="sd">In addition to the basic AlarmServer class there is an AlarmServerModel</span>
+<span class="sd">class which implements the model/view pattern used by the Qt framework.</span>
+<span class="sd">So this class can be used as a model for QTableView or QListView.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">SIGNAL</span>
+<span class="kn">from</span> <span class="nn">qthmi.main.widgets</span> <span class="kn">import</span> <span class="n">HMIObject</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Stefan Lehmann&quot;</span>
+<span class="n">SIGNAL_ALARM_RAISED</span> <span class="o">=</span> <span class="s">&quot;alarmRaised(int, QString)&quot;</span>
+<span class="n">BIT_COUNT</span> <span class="o">=</span> <span class="mi">16</span>
+
+
+<div class="viewcode-block" id="AlarmNotDefinedError"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmNotDefinedError">[docs]</a><span class="k">class</span> <span class="nc">AlarmNotDefinedError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="Alarm"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.Alarm">[docs]</a><span class="k">class</span> <span class="nc">Alarm</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An instance of this class represents a defined or active alarm.</span>
+
+<span class="sd">    :ivar int alarm_nr: unique alarm number, used as key value</span>
+<span class="sd">    :ivar basestring text: alarm text</span>
+<span class="sd">    :ivar datetime time_coming: time the alarm started</span>
+<span class="sd">    :ivar datetime time_going: time the alarm finished</span>
+<span class="sd">    :ivar datetime time_acknowledged: time when alarm got acknowledged by the</span>
+<span class="sd">        user</span>
+<span class="sd">    :ivar int counter: number of times the alarm has been raised since active</span>
+<span class="sd">    :ivar bool is_acknowledged: shows if the alarm has been acknowledged</span>
+<span class="sd">    :ivar bool is_active: shows if the alarm is currently active</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alarm_nr</span> <span class="o">=</span> <span class="n">alarm_nr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_coming</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_going</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_acknowledged</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_acknowledged</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span>
+
+<div class="viewcode-block" id="Alarm.acknowledge"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.Alarm.acknowledge">[docs]</a>    <span class="k">def</span> <span class="nf">acknowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acknowledge the alarm by setting time_acknowledge and the</span>
+<span class="sd">        acknowledged property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_acknowledged</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_acknowledged</span> <span class="o">=</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="Alarm.clear"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.Alarm.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear the alarm by setting back all instance variables</span>
+<span class="sd">        to the init values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_coming</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_going</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_acknowledged</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_acknowledged</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+
+</div></div>
+<div class="viewcode-block" id="AlarmServer"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer">[docs]</a><span class="k">class</span> <span class="nc">AlarmServer</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An alarm server with the possibility to define alarms,</span>
+<span class="sd">    raise, acknowledge and clear them.</span>
+
+<span class="sd">    :ivar list current_alarms: list of current alarms</span>
+<span class="sd">    :ivar dict defined_alarms: dictionary of all defined alarms, key is the alarm number</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AlarmServer.acknowledge"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.acknowledge">[docs]</a>    <span class="k">def</span> <span class="nf">acknowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acknowledge a specific alarm identified via alarm_nr.</span>
+<span class="sd">        :param int alarm_nr: alarm identifiert</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">active_alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">active_alarm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">active_alarm</span><span class="o">.</span><span class="n">acknowledge</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="AlarmServer.acknowledge_all"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.acknowledge_all">[docs]</a>    <span class="k">def</span> <span class="nf">acknowledge_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acknowledge all current alarms.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">alarm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">:</span>
+            <span class="n">alarm</span><span class="o">.</span><span class="n">acknowledge</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AlarmServer.alarm_coming"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.alarm_coming">[docs]</a>    <span class="k">def</span> <span class="nf">alarm_coming</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the alarm with the given number to active.</span>
+<span class="sd">        If the alarm is not active but in the current alarm list</span>
+<span class="sd">        the counter will be raised by one.</span>
+<span class="sd">        If the alarm is not in the current alarm list it will</span>
+<span class="sd">        be inserted.</span>
+<span class="sd">        The C{time_coming} attribute is set to the current time</span>
+<span class="sd">        if the alarm has been inactive.</span>
+
+<span class="sd">        :param int alarm_nr: alarm identifier</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AlarmNotDefinedError</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">alarm</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">alarm</span><span class="o">.</span><span class="n">time_coming</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">alarm</span><span class="o">.</span><span class="n">is_acknowledged</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">alarm</span><span class="o">.</span><span class="n">time_acknowledged</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="k">if</span> <span class="n">alarm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">:</span>
+                <span class="n">alarm</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alarm</span><span class="p">)</span>
+
+        <span class="n">alarm</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="AlarmServer.alarm_going"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.alarm_going">[docs]</a>    <span class="k">def</span> <span class="nf">alarm_going</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the alarm with the given number to inactive.</span>
+<span class="sd">        The C{time_going} attribute is set to the current time</span>
+<span class="sd">        if the alarm has been active.</span>
+
+<span class="sd">        :param int alarm_nr: alarm identifier</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AlarmNotDefinedError</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alarm</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">alarm</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">alarm</span><span class="o">.</span><span class="n">time_going</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AlarmServer.clear"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove the alarm with the given number from the list of</span>
+<span class="sd">        current alarms. All instance variables will be set to</span>
+<span class="sd">        their initial value.</span>
+
+<span class="sd">        :param int alarm_nr: alarm identifier</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">active_alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">active_alarm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">active_alarm</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">active_alarm</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AlarmServer.clear_all"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.clear_all">[docs]</a>    <span class="k">def</span> <span class="nf">clear_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all alarms from the list of current alarms.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">active_alarm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span><span class="n">active_alarm</span><span class="o">.</span><span class="n">alarm_nr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AlarmServer.define_alarm"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.define_alarm">[docs]</a>    <span class="k">def</span> <span class="nf">define_alarm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm_nr</span><span class="p">,</span> <span class="n">alarm_text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define a new alarm and add it to the list C{defined_alarms}.</span>
+
+<span class="sd">        :param int alarm_nr: key value for accessing the alarm</span>
+<span class="sd">        :param basestring alarm_text: text describing the alarm</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alarm</span> <span class="o">=</span> <span class="n">Alarm</span><span class="p">(</span><span class="n">alarm_nr</span><span class="p">,</span> <span class="n">alarm_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defined_alarms</span><span class="p">[</span><span class="n">alarm_nr</span><span class="p">]</span> <span class="o">=</span> <span class="n">alarm</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="AlarmServer.unacknowledged_alarms"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmServer.unacknowledged_alarms">[docs]</a>    <span class="k">def</span> <span class="nf">unacknowledged_alarms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        list of all unacknowledged alarms</span>
+
+<span class="sd">        :rtype: list</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">retVal</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">active_alarm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_alarms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">active_alarm</span><span class="o">.</span><span class="n">is_acknowledged</span><span class="p">:</span>
+                <span class="n">retVal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">active_alarm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">retVal</span>
+
+</div></div>
+<div class="viewcode-block" id="AlarmWord"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmWord">[docs]</a><span class="k">class</span> <span class="nc">AlarmWord</span><span class="p">(</span><span class="n">HMIObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hold the value of an alarm word and raise alarms for each alarm bit.</span>
+
+<span class="sd">    :ivar qthmi.main.Alarmserver alarmserver: alarm server with the defined</span>
+<span class="sd">        alarms</span>
+<span class="sd">    :ivar int offset: offset added to the alarm number</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">alarmserver</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param qthmi.main.Alarmserver alarmserver: alarm server with the defined</span>
+<span class="sd">            alarms</span>
+<span class="sd">        :param int offset: offset added to the alarm number</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">HMIObject</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">alarmserver</span> <span class="o">=</span> <span class="n">alarmserver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reference</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AlarmWord.check"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmWord.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check alarm word for active alarms identified by their bit number.</span>
+<span class="sd">        Call alarm_coming function of the alarmserver for each active alarm.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">bit_nr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">32</span><span class="p">):</span>
+            <span class="n">bit_n</span> <span class="o">=</span> <span class="n">bit_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">bit_nr</span><span class="p">)</span>
+            <span class="n">ref_n</span> <span class="o">=</span> <span class="n">bit_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reference</span><span class="p">,</span> <span class="n">bit_nr</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">bit_n</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">alarmserver</span><span class="o">.</span><span class="n">alarm_coming</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="n">bit_nr</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">alarmserver</span><span class="o">.</span><span class="n">alarm_going</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="n">bit_nr</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">AlarmNotDefinedError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+
+    <span class="nd">@value.setter</span>
+<div class="viewcode-block" id="AlarmWord.value"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmWord.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reference</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+</div>
+<div class="viewcode-block" id="AlarmWord.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmWord.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span>
+</div>
+<div class="viewcode-block" id="AlarmWord.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.AlarmWord.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">HMIObject</span><span class="o">.</span><span class="n">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="HMIAckWord"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.HMIAckWord">[docs]</a><span class="k">class</span> <span class="nc">HMIAckWord</span><span class="p">(</span><span class="n">HMIObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="n">HMIObject</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;value_changed()&quot;</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">read_value_from_tag</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+
+    <span class="nd">@value.setter</span>
+<div class="viewcode-block" id="HMIAckWord.value"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.HMIAckWord.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value_to_tag</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="HMIAckWord.read_value_from_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.HMIAckWord.read_value_from_tag">[docs]</a>    <span class="k">def</span> <span class="nf">read_value_from_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span>
+</div>
+<div class="viewcode-block" id="HMIAckWord.write_value_to_tag"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.HMIAckWord.write_value_to_tag">[docs]</a>    <span class="k">def</span> <span class="nf">write_value_to_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+</div>
+<div class="viewcode-block" id="HMIAckWord.set_bit"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.HMIAckWord.set_bit">[docs]</a>    <span class="k">def</span> <span class="nf">set_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n</span>
+</div>
+<div class="viewcode-block" id="HMIAckWord.reset_bit"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.HMIAckWord.reset_bit">[docs]</a>    <span class="k">def</span> <span class="nf">reset_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="bit_value"><a class="viewcode-back" href="../../../main.html#qthmi.main.alarmserver.bit_value">[docs]</a><span class="k">def</span> <span class="nf">bit_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return value of bit n of value</span>
+
+<span class="sd">    :param int n: bit number, starting with 0</span>
+
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    :return: value of bit n</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">value</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Stefan Lehmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

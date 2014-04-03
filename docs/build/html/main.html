@@ -1,0 +1,1205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>main package &mdash; qthmi.main 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="qthmi.main 0.2.0 documentation" href="index.html" />
+    <link rel="up" title="main" href="modules.html" />
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="main" href="modules.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="main"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">main</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="main-package">
+<h1>main package<a class="headerlink" href="#main-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-qthmi.main.alarmserver">
+<span id="qthmi-main-alarmserver-module"></span><h2>qthmi.main.alarmserver module<a class="headerlink" href="#module-qthmi.main.alarmserver" title="Permalink to this headline">¶</a></h2>
+<p>Handle alarms</p>
+<p>Provides an AlarmServer class which is able to handle
+alarms. It is intended for HMI software where alarm handling is often
+necessary.</p>
+<dl class="docutils">
+<dt>The following features are provided:</dt>
+<dd><ul class="first last simple">
+<li>defining alarms with numbers and alarm texts</li>
+<li>alarms are handled and identified by their alarm number</li>
+<li>alarms can come and leave</li>
+<li>alarms can be acknowledged and cleared by the user</li>
+</ul>
+</dd>
+</dl>
+<p>In addition to the basic AlarmServer class there is an AlarmServerModel
+class which implements the model/view pattern used by the Qt framework.
+So this class can be used as a model for QTableView or QListView.</p>
+<dl class="class">
+<dt id="qthmi.main.alarmserver.Alarm">
+<em class="property">class </em><tt class="descclassname">qthmi.main.alarmserver.</tt><tt class="descname">Alarm</tt><big>(</big><em>alarm_nr</em>, <em>text</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#Alarm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.Alarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>An instance of this class represents a defined or active alarm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>alarm_nr</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; unique alarm number, used as key value</li>
+<li><strong>text</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#basestring" title="(in Python v2.7)"><em>basestring</em></a>) &#8211; alarm text</li>
+<li><strong>time_coming</strong> (<a class="reference external" href="http://docs.python.org/library/datetime.html#module-datetime" title="(in Python v2.7)"><em>datetime</em></a>) &#8211; time the alarm started</li>
+<li><strong>time_going</strong> (<a class="reference external" href="http://docs.python.org/library/datetime.html#module-datetime" title="(in Python v2.7)"><em>datetime</em></a>) &#8211; time the alarm finished</li>
+<li><strong>time_acknowledged</strong> (<a class="reference external" href="http://docs.python.org/library/datetime.html#module-datetime" title="(in Python v2.7)"><em>datetime</em></a>) &#8211; time when alarm got acknowledged by the
+user</li>
+<li><strong>counter</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of times the alarm has been raised since active</li>
+<li><strong>is_acknowledged</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; shows if the alarm has been acknowledged</li>
+<li><strong>is_active</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; shows if the alarm is currently active</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.alarmserver.Alarm.acknowledge">
+<tt class="descname">acknowledge</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#Alarm.acknowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.Alarm.acknowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acknowledge the alarm by setting time_acknowledge and the
+acknowledged property.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.Alarm.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#Alarm.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.Alarm.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the alarm by setting back all instance variables
+to the init values.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="qthmi.main.alarmserver.AlarmNotDefinedError">
+<em class="property">exception </em><tt class="descclassname">qthmi.main.alarmserver.</tt><tt class="descname">AlarmNotDefinedError</tt><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmNotDefinedError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmNotDefinedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.Exception" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.alarmserver.AlarmServer">
+<em class="property">class </em><tt class="descclassname">qthmi.main.alarmserver.</tt><tt class="descname">AlarmServer</tt><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>An alarm server with the possibility to define alarms,
+raise, acknowledge and clear them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>current_alarms</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; list of current alarms</li>
+<li><strong>defined_alarms</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; dictionary of all defined alarms, key is the alarm number</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmServer.acknowledge">
+<tt class="descname">acknowledge</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.acknowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.acknowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acknowledge a specific alarm identified via alarm_nr.
+:param int alarm_nr: alarm identifiert</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmServer.acknowledge_all">
+<tt class="descname">acknowledge_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.acknowledge_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.acknowledge_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acknowledge all current alarms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmServer.alarm_coming">
+<tt class="descname">alarm_coming</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.alarm_coming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.alarm_coming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the alarm with the given number to active.
+If the alarm is not active but in the current alarm list
+the counter will be raised by one.
+If the alarm is not in the current alarm list it will
+be inserted.
+The C{time_coming} attribute is set to the current time
+if the alarm has been inactive.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alarm_nr</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; alarm identifier</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmServer.alarm_going">
+<tt class="descname">alarm_going</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.alarm_going"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.alarm_going" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the alarm with the given number to inactive.
+The C{time_going} attribute is set to the current time
+if the alarm has been active.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alarm_nr</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; alarm identifier</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmServer.clear">
+<tt class="descname">clear</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the alarm with the given number from the list of
+current alarms. All instance variables will be set to
+their initial value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alarm_nr</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; alarm identifier</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmServer.clear_all">
+<tt class="descname">clear_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.clear_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.clear_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all alarms from the list of current alarms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmServer.define_alarm">
+<tt class="descname">define_alarm</tt><big>(</big><em>alarm_nr</em>, <em>alarm_text</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.define_alarm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.define_alarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a new alarm and add it to the list C{defined_alarms}.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>alarm_nr</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; key value for accessing the alarm</li>
+<li><strong>alarm_text</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#basestring" title="(in Python v2.7)"><em>basestring</em></a>) &#8211; text describing the alarm</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="qthmi.main.alarmserver.AlarmServer.unacknowledged_alarms">
+<tt class="descname">unacknowledged_alarms</tt><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmServer.unacknowledged_alarms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmServer.unacknowledged_alarms" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of all unacknowledged alarms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.alarmserver.AlarmWord">
+<em class="property">class </em><tt class="descclassname">qthmi.main.alarmserver.</tt><tt class="descname">AlarmWord</tt><big>(</big><em>tag</em>, <em>alarmserver</em>, <em>offset=0</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmWord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmWord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<p>Hold the value of an alarm word and raise alarms for each alarm bit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>alarmserver</strong> (<em>qthmi.main.Alarmserver</em>) &#8211; alarm server with the defined
+alarms</li>
+<li><strong>offset</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; offset added to the alarm number</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmWord.check">
+<tt class="descname">check</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmWord.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmWord.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check alarm word for active alarms identified by their bit number.
+Call alarm_coming function of the alarmserver for each active alarm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmWord.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmWord.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmWord.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="qthmi.main.alarmserver.AlarmWord.value">
+<tt class="descname">value</tt><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmWord.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmWord.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.AlarmWord.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#AlarmWord.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.AlarmWord.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.alarmserver.HMIAckWord">
+<em class="property">class </em><tt class="descclassname">qthmi.main.alarmserver.</tt><tt class="descname">HMIAckWord</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#HMIAckWord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.HMIAckWord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.alarmserver.HMIAckWord.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#HMIAckWord.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.HMIAckWord.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.HMIAckWord.reset_bit">
+<tt class="descname">reset_bit</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#HMIAckWord.reset_bit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.HMIAckWord.reset_bit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.HMIAckWord.set_bit">
+<tt class="descname">set_bit</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#HMIAckWord.set_bit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.HMIAckWord.set_bit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="qthmi.main.alarmserver.HMIAckWord.value">
+<tt class="descname">value</tt><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#HMIAckWord.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.HMIAckWord.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmserver.HMIAckWord.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#HMIAckWord.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.HMIAckWord.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="qthmi.main.alarmserver.bit_value">
+<tt class="descclassname">qthmi.main.alarmserver.</tt><tt class="descname">bit_value</tt><big>(</big><em>value</em>, <em>n</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmserver.html#bit_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmserver.bit_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return value of bit n of value</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; bit number, starting with 0</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">value of bit n</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.alarmservermodel">
+<span id="main-alarmservermodel-module"></span><h2>main.alarmservermodel module<a class="headerlink" href="#module-qthmi.main.alarmservermodel" title="Permalink to this headline">¶</a></h2>
+<p>Model for alarm handling</p>
+<dl class="class">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel">
+<em class="property">class </em><tt class="descclassname">qthmi.main.alarmservermodel.</tt><tt class="descname">AlarmServerModel</tt><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtCore.QAbstractTableModel</span></tt>, <a class="reference internal" href="#qthmi.main.alarmserver.AlarmServer" title="qthmi.main.alarmserver.AlarmServer"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.alarmserver.AlarmServer</span></tt></a></p>
+<p>This class allows the user access to the alarm server via
+the model/view mechanism of the Qt framework.</p>
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.acknowledge">
+<tt class="descname">acknowledge</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.acknowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.acknowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acknowledge the current alarm with the given number
+and emit a signal &#8216;alarm_acknowledged&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.acknowledge_all">
+<tt class="descname">acknowledge_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.acknowledge_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.acknowledge_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Acknowledge all current alarms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.alarm_coming">
+<tt class="descname">alarm_coming</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.alarm_coming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.alarm_coming" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.alarm_going">
+<tt class="descname">alarm_going</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.alarm_going"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.alarm_going" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.clear">
+<tt class="descname">clear</tt><big>(</big><em>alarm_nr</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the current alarm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alarm_nr</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of the alarm</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.clear_all">
+<tt class="descname">clear_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.clear_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.clear_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear all current alarms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.columnCount">
+<tt class="descname">columnCount</tt><big>(</big><em>index=&lt;PyQt4.QtCore.QModelIndex object at 0x03F93570&gt;</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.columnCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.columnCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.data">
+<tt class="descname">data</tt><big>(</big><em>index</em>, <em>role=0</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.headerData">
+<tt class="descname">headerData</tt><big>(</big><em>section</em>, <em>orientation</em>, <em>role=0</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.headerData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.headerData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.alarmservermodel.AlarmServerModel.rowCount">
+<tt class="descname">rowCount</tt><big>(</big><em>index=&lt;PyQt4.QtCore.QModelIndex object at 0x03F93A08&gt;</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/alarmservermodel.html#AlarmServerModel.rowCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.alarmservermodel.AlarmServerModel.rowCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.connector">
+<span id="main-connector-module"></span><h2>main.connector module<a class="headerlink" href="#module-qthmi.main.connector" title="Permalink to this headline">¶</a></h2>
+<p>Abstract class for PLC connection</p>
+<dl class="class">
+<dt id="qthmi.main.connector.AbstractPLCConnector">
+<em class="property">class </em><tt class="descclassname">qthmi.main.connector.</tt><tt class="descname">AbstractPLCConnector</tt><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtCore.QObject</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Connector with buffered PLC access. The access is not done directly via PLC addresses but instead with
+Tags. Data is exchanged with the PLC when the C{poll()} function is called or C{autopoll} is enabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tags</strong> &#8211; holds the Tag objects, the key is the tag name</li>
+<li><strong>poll_interval</strong> &#8211; interval for auto-polling in ms</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.connector.AbstractPLCConnector.add_tag">
+<tt class="descname">add_tag</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.add_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.add_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a Tag to the list.
+:type tag: Tag
+:return: tag</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="qthmi.main.connector.AbstractPLCConnector.cycletime">
+<tt class="descname">cycletime</tt><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.cycletime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.cycletime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.connector.AbstractPLCConnector.poll">
+<tt class="descname">poll</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.poll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exchange data with PLC.</p>
+<p>If a Tag value has been modified in the GUI the value is first written to the PLC and then read again.</p>
+<p>The SIGNAL C{polled()} is emitted when finished.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.connector.AbstractPLCConnector.read_from_plc">
+<tt class="descname">read_from_plc</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.read_from_plc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.read_from_plc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.connector.AbstractPLCConnector.remove_tag">
+<tt class="descname">remove_tag</tt><big>(</big><em>tag_name</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.remove_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a Tag from the list.
+:type tag_name: str
+:param tag_name: name of the Tag</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.connector.AbstractPLCConnector.start_autopoll">
+<tt class="descname">start_autopoll</tt><big>(</big><em>poll_interval</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.start_autopoll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.start_autopoll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable auto-polling data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>poll_interval</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; interval for autopolling in ms</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.connector.AbstractPLCConnector.stop_autopoll">
+<tt class="descname">stop_autopoll</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.stop_autopoll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.stop_autopoll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable auto-polling data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.connector.AbstractPLCConnector.write_to_plc">
+<tt class="descname">write_to_plc</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#AbstractPLCConnector.write_to_plc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.AbstractPLCConnector.write_to_plc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.connector.BufferConnector">
+<em class="property">class </em><tt class="descclassname">qthmi.main.connector.</tt><tt class="descname">BufferConnector</tt><big>(</big><em>connector</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#BufferConnector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.BufferConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.connector.AbstractPLCConnector" title="qthmi.main.connector.AbstractPLCConnector"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.connector.AbstractPLCConnector</span></tt></a></p>
+<p>Connect to other Connectors.</p>
+<p>Buffer Tag values for Plotting or Logging independently from the poll
+interval of the original Connector. So all processdata can still be
+collected continuously while some HMIWidgets like plotters or loggers are
+only refreshed when asked for.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>connector</strong> &#8211; data source</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.connector.BufferConnector.read_from_plc">
+<tt class="descname">read_from_plc</tt><big>(</big><em>address</em>, <em>datatype</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#BufferConnector.read_from_plc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.BufferConnector.read_from_plc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.connector.BufferConnector.write_to_plc">
+<tt class="descname">write_to_plc</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#BufferConnector.write_to_plc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.BufferConnector.write_to_plc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="qthmi.main.connector.ConnectionError">
+<em class="property">exception </em><tt class="descclassname">qthmi.main.connector.</tt><tt class="descname">ConnectionError</tt><a class="reference internal" href="_modules/qthmi/main/connector.html#ConnectionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.ConnectionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.Exception" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="qthmi.main.connector.abstractmethod">
+<tt class="descclassname">qthmi.main.connector.</tt><tt class="descname">abstractmethod</tt><big>(</big><em>method</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/connector.html#abstractmethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.connector.abstractmethod" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.input">
+<span id="main-input-module"></span><h2>main.input module<a class="headerlink" href="#module-qthmi.main.input" title="Permalink to this headline">¶</a></h2>
+<p>Widgets for user input via TouchScreen</p>
+<dl class="class">
+<dt id="qthmi.main.input.NumPad">
+<em class="property">class </em><tt class="descclassname">qthmi.main.input.</tt><tt class="descname">NumPad</tt><big>(</big><em>parent=None</em>, <em>text=''</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/input.html#NumPad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.input.NumPad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QDialog</span></tt>, <a class="reference internal" href="#qthmi.main.ui_numpad.Ui_numPad" title="qthmi.main.ui_numpad.Ui_numPad"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.ui_numpad.Ui_numPad</span></tt></a></p>
+<p>&#64;summary: Nummernblock, welcher auf dem Bildschirm erscheint. Ermöglicht die Eingabe von Zahlen 
+auf einem Touchscreen</p>
+<dl class="method">
+<dt id="qthmi.main.input.NumPad.button_pressed">
+<tt class="descname">button_pressed</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/input.html#NumPad.button_pressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.input.NumPad.button_pressed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.input.NumPad.outputLineEdit_focusOutEvent">
+<tt class="descname">outputLineEdit_focusOutEvent</tt><big>(</big><em>e</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/input.html#NumPad.outputLineEdit_focusOutEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.input.NumPad.outputLineEdit_focusOutEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="qthmi.main.input.bin">
+<tt class="descclassname">qthmi.main.input.</tt><tt class="descname">bin</tt><big>(</big><em>QTextStream</em><big>)</big> &rarr; QTextStream<a class="headerlink" href="#qthmi.main.input.bin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qthmi.main.input.hex">
+<tt class="descclassname">qthmi.main.input.</tt><tt class="descname">hex</tt><big>(</big><em>QTextStream</em><big>)</big> &rarr; QTextStream<a class="headerlink" href="#qthmi.main.input.hex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qthmi.main.input.oct">
+<tt class="descclassname">qthmi.main.input.</tt><tt class="descname">oct</tt><big>(</big><em>QTextStream</em><big>)</big> &rarr; QTextStream<a class="headerlink" href="#qthmi.main.input.oct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.log">
+<span id="main-log-module"></span><h2>main.log module<a class="headerlink" href="#module-qthmi.main.log" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qthmi.main.log.CSVWriter">
+<em class="property">class </em><tt class="descclassname">qthmi.main.log.</tt><tt class="descname">CSVWriter</tt><big>(</big><em>parent=None</em>, <em>dialect=&lt;csv.excel instance at 0x04503260&gt;</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/log.html#CSVWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.log.CSVWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<p>Write Tag values in CSV files.
+:type tags: list(Tag)
+:ivar tags: connected Tag objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>dialect</strong> &#8211; Dialect for CSV output</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.log.CSVWriter.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/log.html#CSVWriter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.log.CSVWriter.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.log.CSVWriter.open">
+<tt class="descname">open</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/log.html#CSVWriter.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.log.CSVWriter.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open file for CSV output.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.log.CSVWriter.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/log.html#CSVWriter.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.log.CSVWriter.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.log.CSVWriter.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/log.html#CSVWriter.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.log.CSVWriter.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.log.CSVWriter.writerow">
+<tt class="descname">writerow</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/log.html#CSVWriter.writerow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.log.CSVWriter.writerow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all Tag values in the opened CSV file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.plot">
+<span id="main-plot-module"></span><h2>main.plot module<a class="headerlink" href="#module-qthmi.main.plot" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="realtime-data-plotting">
+<h3>Realtime data plotting<a class="headerlink" href="#realtime-data-plotting" title="Permalink to this headline">¶</a></h3>
+<p>Plot PLC data in Realtime.</p>
+<p>For HMIPlot to work we need the following packages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="n">QApplication</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">qthmi.main.connector</span> <span class="kn">import</span> <span class="n">AbstractPLCConnector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">qthmi.main.tag</span> <span class="kn">import</span> <span class="n">Tag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">QApplication</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we create a new Connector and the HMIPlot object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">connector</span> <span class="o">=</span> <span class="n">AbstractPLCConnector</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span> <span class="o">=</span> <span class="n">HMIPlot</span><span class="p">(</span><span class="n">connector</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="go">&lt;class &#39;qthmi.main.plot.HMIPlot&#39;&gt;</span>
+</pre></div>
+</div>
+<p>The C{add_observer()} method is used to creat an Observer object collecting
+data from the given Tag:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tag1</span> <span class="o">=</span> <span class="n">connector</span><span class="o">.</span><span class="n">add_tag</span><span class="p">(</span><span class="n">Tag</span><span class="p">(</span><span class="s">&quot;tag1&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="o">.</span><span class="n">add_observer</span><span class="p">(</span><span class="n">tag1</span><span class="p">,</span> <span class="s">&quot;Tag1&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&quot;b-&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">observers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">&lt;class &#39;qthmi.main.plot.Observer&#39;&gt;</span>
+</pre></div>
+</div>
+<p>The HMIPlot object is inherited from C{QWidget} and can be displayed on its own
+by calling the C{show()} function or embedded in a second QWidget object.</p>
+<dl class="class">
+<dt id="qthmi.main.plot.HMIPlot">
+<em class="property">class </em><tt class="descclassname">qthmi.main.plot.</tt><tt class="descname">HMIPlot</tt><big>(</big><em>connector</em>, <em>parent=None</em>, <em>buffer_size=100</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#HMIPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.HMIPlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Realtime Plot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>connector</strong> &#8211; connector instance for plc communication</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.plot.HMIPlot.add_observer">
+<tt class="descname">add_observer</tt><big>(</big><em>observer</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#HMIPlot.add_observer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.HMIPlot.add_observer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add observer to HMIPlot.
+:type observer: Observer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.plot.HMIPlot.autoscale_xaxis">
+<tt class="descname">autoscale_xaxis</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#HMIPlot.autoscale_xaxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.HMIPlot.autoscale_xaxis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.plot.HMIPlot.draw">
+<tt class="descname">draw</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#HMIPlot.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.HMIPlot.draw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.plot.HMIPlot.refresh">
+<tt class="descname">refresh</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#HMIPlot.refresh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.HMIPlot.refresh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot current data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.plot.Observer">
+<em class="property">class </em><tt class="descclassname">qthmi.main.plot.</tt><tt class="descname">Observer</tt><big>(</big><em>tag</em>, <em>buffer_size=100</em>, <em>label=''</em>, <em>ax=0</em>, <em>style='-'</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#Observer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.Observer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.widgets.HMIWidget" title="qthmi.main.widgets.HMIWidget"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIWidget</span></tt></a></p>
+<p>Binding object between a Tag and HMIPlot</p>
+<dl class="method">
+<dt id="qthmi.main.plot.Observer.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#Observer.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.Observer.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.plot.Observer.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#Observer.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.Observer.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.plot.TimeDeltaObserver">
+<em class="property">class </em><tt class="descclassname">qthmi.main.plot.</tt><tt class="descname">TimeDeltaObserver</tt><big>(</big><em>tag</em>, <em>buffer_size=100</em>, <em>label=''</em>, <em>ax=0</em>, <em>style='-'</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#TimeDeltaObserver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.TimeDeltaObserver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.plot.Observer" title="qthmi.main.plot.Observer"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.plot.Observer</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.plot.TimeDeltaObserver.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/plot.html#TimeDeltaObserver.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.plot.TimeDeltaObserver.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-qthmi.main.resources_rc">
+<span id="main-resources-rc-module"></span><h2>main.resources_rc module<a class="headerlink" href="#module-qthmi.main.resources_rc" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="qthmi.main.resources_rc.qCleanupResources">
+<tt class="descclassname">qthmi.main.resources_rc.</tt><tt class="descname">qCleanupResources</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/resources_rc.html#qCleanupResources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.resources_rc.qCleanupResources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="qthmi.main.resources_rc.qInitResources">
+<tt class="descclassname">qthmi.main.resources_rc.</tt><tt class="descname">qInitResources</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/resources_rc.html#qInitResources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.resources_rc.qInitResources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.tag">
+<span id="main-tag-module"></span><h2>main.tag module<a class="headerlink" href="#module-qthmi.main.tag" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qthmi.main.tag.ScaledTag">
+<em class="property">class </em><tt class="descclassname">qthmi.main.tag.</tt><tt class="descname">ScaledTag</tt><big>(</big><em>name</em>, <em>address</em>, <em>plc_datatype=None</em>, <em>datatype=&lt;type 'float'&gt;</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/tag.html#ScaledTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.ScaledTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.tag.Tag" title="qthmi.main.tag.Tag"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.tag.Tag</span></tt></a></p>
+<p>Tag that supplies a converted, scaled and offset value</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tag</span> <span class="o">=</span> <span class="n">ScaledTag</span><span class="p">(</span><span class="s">&quot;scaled_tag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tag</span><span class="o">.</span><span class="n">scale_factor</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tag</span><span class="o">.</span><span class="n">scale_offset</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tag</span><span class="o">.</span><span class="n">_raw_value</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tag</span><span class="o">.</span><span class="n">value</span>
+<span class="go">25.0</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>scale</strong> &#8211; factor for scaling the raw_value</li>
+<li><strong>offset</strong> &#8211; offset added to the raw_value</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="qthmi.main.tag.ScaledTag.value">
+<tt class="descname">value</tt><a class="reference internal" href="_modules/qthmi/main/tag.html#ScaledTag.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.ScaledTag.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>converted, scaled and offset value for use in GUI</p>
+<p>If value is set the new value will be transferred to the PLC the
+next time the C{poll()} function of the C{BufferedPLCConnector}
+object is called.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.tag.Tag">
+<em class="property">class </em><tt class="descclassname">qthmi.main.tag.</tt><tt class="descname">Tag</tt><big>(</big><em>name</em>, <em>address</em>, <em>plc_datatype=None</em>, <em>datatype=&lt;type 'float'&gt;</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/tag.html#Tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.Tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtCore.QObject</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of Tag represents a buffered connection between GUI and PLC</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; tag name</li>
+<li><strong>address</strong> &#8211; PLC memory address</li>
+<li><strong>datatype</strong> &#8211; python datatype</li>
+<li><strong>dirty</strong> &#8211; is set if the tag value has been changed</li>
+<li><strong>plc_datatype</strong> &#8211; identifier for the datatype the data is stored in the PLC</li>
+<li><strong>raw_value</strong> &#8211; the raw PLC value</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="qthmi.main.tag.Tag.raw_value">
+<tt class="descname">raw_value</tt><a class="reference internal" href="_modules/qthmi/main/tag.html#Tag.raw_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.Tag.raw_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The raw PLC value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="qthmi.main.tag.Tag.value">
+<tt class="descname">value</tt><a class="reference internal" href="_modules/qthmi/main/tag.html#Tag.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.Tag.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>If value is set the new value will be transferred to the PLC the next time the C{poll()} function
+of the C{BufferedPLCConnector} object is called.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.tag.TextTag">
+<em class="property">class </em><tt class="descclassname">qthmi.main.tag.</tt><tt class="descname">TextTag</tt><big>(</big><em>name</em>, <em>address</em>, <em>plc_datatype=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/tag.html#TextTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.TextTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.tag.Tag" title="qthmi.main.tag.Tag"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.tag.Tag</span></tt></a></p>
+<p>Tag that supplies defined texts constraint to integer values</p>
+<dl class="method">
+<dt id="qthmi.main.tag.TextTag.add_text">
+<tt class="descname">add_text</tt><big>(</big><em>key</em>, <em>text</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/tag.html#TextTag.add_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.TextTag.add_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a text message definition</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> &#8211; Tag value as key</li>
+<li><strong>text</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#basestring" title="(in Python v2.7)"><em>basestring</em></a>) &#8211; text message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.tag.TextTag.get_text">
+<tt class="descname">get_text</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/tag.html#TextTag.get_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.TextTag.get_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.tag.TextTag.pop_text">
+<tt class="descname">pop_text</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/tag.html#TextTag.pop_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.TextTag.pop_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove text message for the given key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> &#8211; Tag value as key</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">text message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="qthmi.main.tag.TextTag.value">
+<tt class="descname">value</tt><a class="reference internal" href="_modules/qthmi/main/tag.html#TextTag.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.tag.TextTag.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.ui_numpad">
+<span id="main-ui-numpad-module"></span><h2>main.ui_numpad module<a class="headerlink" href="#module-qthmi.main.ui_numpad" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="qthmi.main.ui_numpad.Ui_numPad">
+<em class="property">class </em><tt class="descclassname">qthmi.main.ui_numpad.</tt><tt class="descname">Ui_numPad</tt><a class="reference internal" href="_modules/qthmi/main/ui_numpad.html#Ui_numPad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.ui_numpad.Ui_numPad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="qthmi.main.ui_numpad.Ui_numPad.retranslateUi">
+<tt class="descname">retranslateUi</tt><big>(</big><em>numPad</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/ui_numpad.html#Ui_numPad.retranslateUi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.ui_numpad.Ui_numPad.retranslateUi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.ui_numpad.Ui_numPad.setupUi">
+<tt class="descname">setupUi</tt><big>(</big><em>numPad</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/ui_numpad.html#Ui_numPad.setupUi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.ui_numpad.Ui_numPad.setupUi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.util">
+<span id="main-util-module"></span><h2>main.util module<a class="headerlink" href="#module-qthmi.main.util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="qthmi.main.util.timeit">
+<tt class="descclassname">qthmi.main.util.</tt><tt class="descname">timeit</tt><big>(</big><em>method</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/util.html#timeit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.util.timeit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for measuring execution time of a function.
+Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nd">@timeit</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">f1</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;f1&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main.widgets">
+<span id="main-widgets-module"></span><h2>main.widgets module<a class="headerlink" href="#module-qthmi.main.widgets" title="Permalink to this headline">¶</a></h2>
+<p>Access PLC values via common GUI objects</p>
+<dl class="class">
+<dt id="qthmi.main.widgets.HMIComboBox">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMIComboBox</tt><big>(</big><em>tag=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIComboBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIComboBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QComboBox</span></tt>, <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIComboBox.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIComboBox.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIComboBox.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIComboBox.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIComboBox.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIComboBox.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMIDoubleSpinBox">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMIDoubleSpinBox</tt><big>(</big><em>tag=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIDoubleSpinBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIDoubleSpinBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QDoubleSpinBox</span></tt>, <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIDoubleSpinBox.eventFilter">
+<tt class="descname">eventFilter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIDoubleSpinBox.eventFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIDoubleSpinBox.eventFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIDoubleSpinBox.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIDoubleSpinBox.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIDoubleSpinBox.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIDoubleSpinBox.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIDoubleSpinBox.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIDoubleSpinBox.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMIIndicator">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMIIndicator</tt><big>(</big><em>tag</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIIndicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIIndicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></tt>, <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIIndicator.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIIndicator.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIIndicator.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIIndicator.setText">
+<tt class="descname">setText</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIIndicator.setText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIIndicator.setText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIIndicator.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIIndicator.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIIndicator.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMILabel">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMILabel</tt><big>(</big><em>tag=None</em>, <em>parent=None</em>, <em>format_spec='{:03.3f}'</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMILabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMILabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QLabel</span></tt>, <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMILabel.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMILabel.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMILabel.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMILabel.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMILabel.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMILabel.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMILineEdit">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMILineEdit</tt><big>(</big><em>tag=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMILineEdit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMILineEdit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QLineEdit</span></tt>, <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMILineEdit.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMILineEdit.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMILineEdit.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMILineEdit.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMILineEdit.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMILineEdit.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMIObject">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMIObject</tt><big>(</big><em>tag=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtCore.QObject</span></tt></p>
+<p>Basic HMI class</p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIObject.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIObject.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIObject.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIObject.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIObject.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIObject.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMIPushButton">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMIPushButton</tt><big>(</big><em>tag=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIPushButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIPushButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QPushButton</span></tt>, <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIPushButton.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIPushButton.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIPushButton.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIPushButton.setCheckable">
+<tt class="descname">setCheckable</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIPushButton.setCheckable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIPushButton.setCheckable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMIPushButton.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIPushButton.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIPushButton.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMISpinBox">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMISpinBox</tt><big>(</big><em>tag=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMISpinBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMISpinBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QSpinBox</span></tt>, <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMISpinBox.eventFilter">
+<tt class="descname">eventFilter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMISpinBox.eventFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMISpinBox.eventFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMISpinBox.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMISpinBox.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMISpinBox.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMISpinBox.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMISpinBox.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMISpinBox.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMITextMapper">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMITextMapper</tt><big>(</big><em>tag</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMITextMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMITextMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a></p>
+<p>Map text messages to keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>text_definitions</strong> &#8211; defined pairs of numeric values and text messages</li>
+<li><strong>text</strong> &#8211; Corresponding text message to the current tag value. Empty if no text for the given
+key is defined.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="qthmi.main.widgets.HMITextMapper.add_text">
+<tt class="descname">add_text</tt><big>(</big><em>key</em>, <em>text</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMITextMapper.add_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMITextMapper.add_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a text message definition</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> &#8211; Tag value as key</li>
+<li><strong>text</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#basestring" title="(in Python v2.7)"><em>basestring</em></a>) &#8211; text message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMITextMapper.pop_text">
+<tt class="descname">pop_text</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMITextMapper.pop_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMITextMapper.pop_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove text message for the given key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> &#8211; Tag value as key</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">text message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMITextMapper.read_value_from_tag">
+<tt class="descname">read_value_from_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMITextMapper.read_value_from_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMITextMapper.read_value_from_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="qthmi.main.widgets.HMITextMapper.write_value_to_tag">
+<tt class="descname">write_value_to_tag</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMITextMapper.write_value_to_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMITextMapper.write_value_to_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="qthmi.main.widgets.HMIWidget">
+<em class="property">class </em><tt class="descclassname">qthmi.main.widgets.</tt><tt class="descname">HMIWidget</tt><big>(</big><em>tag=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/qthmi/main/widgets.html#HMIWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#qthmi.main.widgets.HMIWidget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qthmi.main.widgets.HMIObject" title="qthmi.main.widgets.HMIObject"><tt class="xref py py-class docutils literal"><span class="pre">qthmi.main.widgets.HMIObject</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></tt></p>
+<p>Basic HMI Widget class</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-qthmi.main">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qthmi.main" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">main package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.alarmserver">qthmi.main.alarmserver module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.alarmservermodel">main.alarmservermodel module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.connector">main.connector module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.input">main.input module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.log">main.log module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.plot">main.plot module</a><ul>
+<li><a class="reference internal" href="#realtime-data-plotting">Realtime data plotting</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-qthmi.main.resources_rc">main.resources_rc module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.tag">main.tag module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.ui_numpad">main.ui_numpad module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.util">main.util module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main.widgets">main.widgets module</a></li>
+<li><a class="reference internal" href="#module-qthmi.main">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="previous chapter">main</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="usage.html"
+                        title="next chapter">Usage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/main.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="main"
+             >previous</a> |</li>
+        <li><a href="index.html">qthmi.main 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >main</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Stefan Lehmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
