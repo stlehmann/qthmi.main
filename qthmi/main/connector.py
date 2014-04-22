@@ -47,6 +47,14 @@ class AbstractPLCConnector(QObject, object):
         self.tags[tag.name] = tag
         return tag
 
+    def add_tags(self, tags):
+        """
+        Add the tags to the internal list.
+        :param list/tuple tags: a list of tags
+
+        """
+        map(self.add_tag, tags)
+
     @property
     def cycletime(self):
         return self.autopoll_timer.interval()
