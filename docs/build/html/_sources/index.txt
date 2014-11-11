@@ -11,11 +11,12 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   changelog
    main
    modules
    usage
-
-
+   todo 
+   
 
 Indices and tables
 ==================
