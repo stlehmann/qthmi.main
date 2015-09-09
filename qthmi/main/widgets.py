@@ -4,11 +4,10 @@ Access PLC values via common GUI objects
 """
 from matplotlib.backends.qt4_editor.formlayout import QLineEdit
 
-__author__ = "Stefan Lehmann"
-
-
-from PyQt4.QtCore import QEvent, SIGNAL, QObject
-from PyQt4.QtGui import QDoubleSpinBox, QDialog, QLabel, QComboBox, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QPixmap, QPicture, QSpinBox
+from PyQt4.QtCore import QEvent, SIGNAL, QObject, Qt
+from PyQt4.QtGui import QDoubleSpinBox, QDialog, QLabel, QComboBox, QWidget, \
+    QPushButton, QVBoxLayout, QHBoxLayout, QPixmap, QPicture, QSpinBox, \
+    QCheckBox
 
 from input import NumPad
 from qthmi.main.connector import abstractmethod
@@ -16,6 +15,7 @@ from resources_rc import *
 
 
 class HMIObject(QObject):
+
     """
     Basic HMI class
 
@@ -270,3 +270,22 @@ class HMIIndicator(QWidget, HMIObject):
 
     def setText(self, text):
         self.text_label.setText(text)
+
+
+class HMICheckBox(QCheckBox):
+
+    """
+    Checkbox for displaying and switching a boolean tag.
+
+    """
+
+    def __init__(self, tag, parent=None):
+        super(HMIIndicator, self).__init__(tag, parent)
+        self.tag.value_changed.connect(self.read_value_from_tag)
+        self.stateChanged.connect(self.tag.write_value_to_tag)
+
+    def read_value_from_tag(self):
+        self.setCheckState(Qt.Checked if self.tag.value else Qt.Unchecked)
+
+    def write_value_to_tag(self):
+        self.tag.value = self.isChecked()
