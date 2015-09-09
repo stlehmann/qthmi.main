@@ -272,17 +272,19 @@ class HMIIndicator(QWidget, HMIObject):
         self.text_label.setText(text)
 
 
-class HMICheckBox(QCheckBox):
+class HMICheckBox(QCheckBox, HMIObject):
 
     """
     Checkbox for displaying and switching a boolean tag.
 
     """
 
-    def __init__(self, tag, parent=None):
-        super(HMIIndicator, self).__init__(tag, parent)
-        self.tag.value_changed.connect(self.read_value_from_tag)
-        self.stateChanged.connect(self.tag.write_value_to_tag)
+    def __init__(self, tag=None, parent=None):
+        super(HMICheckBox, self).__init__(tag, parent)
+        self.connect(self.tag, SIGNAL("value_changed()"),
+                     self.read_value_from_tag)
+        self.connect(self, SIGNAL("stateChanged(int)"),
+                     self.write_value_to_tag)
 
     def read_value_from_tag(self):
         self.setCheckState(Qt.Checked if self.tag.value else Qt.Unchecked)
