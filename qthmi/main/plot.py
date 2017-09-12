@@ -32,16 +32,14 @@ by calling the C{show()} function or embedded in a second QWidget object.
 
 """
 from datetime import datetime
+import pylab
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from qthmi.main.widgets import HMIWidget
+
 
 __author__ = "Stefan Lehmann"
-
-
-import time
-import pylab
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QWidget, QVBoxLayout
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg
-from qthmi.main.widgets import HMIWidget
 
 
 class Observer(HMIWidget):
@@ -74,6 +72,7 @@ class Observer(HMIWidget):
 
 
 class TimeDeltaObserver(Observer):
+
     def read_value_from_tag(self):
         if len(self.x) == 0:
             self.starttime = datetime.now()
@@ -94,7 +93,6 @@ class HMIPlot (QWidget, object):
     :type connector: connector.PLCConnector
     :ivar connector: connector instance for plc communication
     """
-
     def __init__(self, connector, parent=None, buffer_size=100):
         """
         :type connector: qthmi.main.connector.AbstractPLCConnector
@@ -106,19 +104,19 @@ class HMIPlot (QWidget, object):
         self.observers = []
         self.lines = []
 
-        #Init matplotlib objects
-        #----------------------------------------------------
+        # Init matplotlib objects
+        # ----------------------------------------------------
         self.fig = pylab.figure(1)
         self.canvas = FigureCanvasQTAgg(self.fig)
         self.axes = [self.fig.add_subplot(111)]
         self.axes.append(self.axes[0].twinx())
 
-        #Layout
-        #----------------------------------------------------
+        # Layout
+        # ----------------------------------------------------
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self.canvas)
 
-        self.connect(self.connector, SIGNAL("polled()"), self.refresh)
+        self.connector.polled.connect(self.refresh)
 
     def add_observer(self, observer):
         """
@@ -130,7 +128,7 @@ class HMIPlot (QWidget, object):
 
         self.lines.append(
             self.axes[observer.ax].plot([], [], observer.style,
-                                                label=observer.label)[0])
+                                        label=observer.label)[0])
 
     def autoscale_xaxis(self):
         self.axes[0].set_xlim(
@@ -144,7 +142,6 @@ class HMIPlot (QWidget, object):
         Plot current data.
 
         """
-
         prim_observer = self.observers[0]
         if len(prim_observer.x) > 1:
             self.axes[0].set_xlim(prim_observer.x[0], prim_observer.x[-1])
@@ -152,6 +149,7 @@ class HMIPlot (QWidget, object):
         for i, observer in enumerate(self.observers):
             observer.read_value_from_tag()
             self.lines[i].set_data(observer.x, observer.y)
+        self.draw()
 
     def draw(self):
         self.canvas.draw()

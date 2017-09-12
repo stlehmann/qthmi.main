@@ -1,20 +1,20 @@
-#-*- coding: utf-8 -*-
 """
 Model for alarm handling
 
 """
-__author__ = "Stefan Lehmann"
+from PyQt5.QtGui import QColor
+from PyQt5.QtCore import QAbstractTableModel, Qt, QVariant, QModelIndex, \
+    pyqtSignal
+from .alarmserver import AlarmServer, AlarmNotDefinedError
 
-from PyQt4.QtGui import QColor
-from PyQt4.QtCore import QAbstractTableModel, Qt, QVariant, QModelIndex, SIGNAL
-from alarmserver import AlarmServer, AlarmNotDefinedError
+
+__author__ = "Stefan Lehmann"
 
 ALARM_NR = 0
 ALARM_TEXT = 1
 ALARM_COUNTER = 2
 ALARM_TIME_COMING = 3
 ALARM_TIME_GOING = 4
-
 COLUMN_COUNT = 5
 TIME_PATTERN = "%H:%M:%S"
 
@@ -25,6 +25,8 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
     the model/view mechanism of the Qt framework.
 
     """
+    dataChanged = pyqtSignal(QModelIndex, QModelIndex)
+    alarm_acknowledged = pyqtSignal(int)
 
     def __init__(self):
         AlarmServer.__init__(self)
@@ -40,8 +42,7 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             row = self.current_alarms.index(alarm)
             indexTopLeft = self.index(row, 0, QModelIndex())
             indexBottomRight = self.index(row, COLUMN_COUNT - 1, QModelIndex())
-            self.emit(SIGNAL("dataChanged(QModelIndex, QModelIndex)"),
-                      indexTopLeft, indexBottomRight)
+            self.dataChanged.emit(indexTopLeft, indexBottomRight)
 
     def acknowledge(self, alarm_nr):
         """
@@ -52,7 +53,7 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
 
         AlarmServer.acknowledge(self, alarm_nr)
         self._dataChanged_signal(alarm_nr)
-        self.emit(SIGNAL("alarm_acknowledged(int)"), alarm_nr)
+        self.alarm_acknowledged.emit(alarm_nr)
 
     def acknowledge_all(self):
         """
@@ -76,8 +77,7 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             indexTopLeft = self.index(row, 0, QModelIndex())
             indexBottomRight = self.index(row, COLUMN_COUNT - 1, QModelIndex())
 
-            self.emit(SIGNAL("dataChanged(QModelIndex, QModelIndex)"),
-                      indexTopLeft, indexBottomRight)
+            self.dataChanged.emit(indexTopLeft, indexBottomRight)
         else:
             alarm_count = len(self.current_alarms)
             self.beginInsertRows(
@@ -93,9 +93,9 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
     def clear(self, alarm_nr):
         """
         Clear the current alarm.
-        
+
         :param int alarm_nr: number of the alarm
-        
+
         """
         alarm = self.defined_alarms.get(alarm_nr)
         if alarm is None:
@@ -110,7 +110,7 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
     def clear_all(self):
         """
         Clear all current alarms.
-        
+
         """
         self.beginResetModel()
         AlarmServer.clear_all(self)

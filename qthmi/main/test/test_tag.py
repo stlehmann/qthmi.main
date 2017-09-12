@@ -17,7 +17,7 @@ class TextTag_Test(unittest.TestCase):
             pass
 
         def read_from_plc(self, *args, **kwargs):
-            return self.keys.next()
+            return next(self.keys)
 
     def setUp(self):
         self.connector = TextTag_Test.AddOneTestConnector()
@@ -47,3 +47,7 @@ class TextTag_Test(unittest.TestCase):
 
         self.connector.poll()
         self.assertEqual(self.texttag.value, "")
+
+
+if __name__ == '__main__':
+    unittest.main()

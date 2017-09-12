@@ -1,13 +1,13 @@
-from PyQt4.QtGui import QApplication
-import pylab
 import sys
-from qthmi.main.plot import HMIPlot, Observer, Observer
-
-__author__ = 'Stefan Lehmann'
-
-
+import pylab
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import pyqtRemoveInputHook
+from qthmi.main.plot import HMIPlot, Observer
 from qthmi.main.connector import AbstractPLCConnector
 from qthmi.main.tag import Tag
+
+
+__author__ = 'Stefan Lehmann'
 
 
 class TestConnector(AbstractPLCConnector):
@@ -42,6 +42,7 @@ class SinwaveGenerator():
         self.t1 = Tnext
         return self.values[-1]
 
+pyqtRemoveInputHook()
 
 app = QApplication(sys.argv)
 connector = TestConnector()
@@ -50,8 +51,8 @@ connector.add_tag(Tag("Signal 2", 2000))
 connector.start_autopoll(100)
 
 hmi_plot = HMIPlot(connector)
-hmi_plot.add_observer(connector.tags["Signal 1"], 50)
-hmi_plot.add_observer(connector.tags["Signal 2"], 100)
+hmi_plot.add_observer(Observer(connector.tags["Signal 1"], 50))
+hmi_plot.add_observer(Observer(connector.tags["Signal 2"], 200))
 hmi_plot.delta_x = 100
 hmi_plot.fig.autofmt_xdate()
 hmi_plot.axes[0].legend(("Test", "Test2"))

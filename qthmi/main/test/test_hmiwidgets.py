@@ -3,6 +3,7 @@ from qthmi.main.connector import AbstractPLCConnector
 from qthmi.main.tag import Tag
 from qthmi.main.widgets import HMITextMapper
 
+
 __author__ = 'Stefan Lehmann'
 
 
@@ -15,7 +16,7 @@ class AddOneTestConnector(AbstractPLCConnector):
         pass
 
     def read_from_plc(self, *args, **kwargs):
-        return self.keys.next()
+        return next(self.keys)
 
 
 class HMITextMapper_Test(unittest.TestCase):
@@ -50,4 +51,5 @@ class HMITextMapper_Test(unittest.TestCase):
         self.assertEqual(self.textmapper.text, "")
 
 
-
+if __name__ == '__main__':
+    unittest.main()

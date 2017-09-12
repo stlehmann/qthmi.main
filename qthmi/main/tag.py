@@ -1,7 +1,7 @@
+from PyQt5.QtCore import QObject, pyqtSignal
+
+
 __author__ = 'Stefan Lehmann'
-
-
-from PyQt4.QtCore import QObject, SIGNAL
 
 
 class Tag(QObject, object):
@@ -19,10 +19,12 @@ class Tag(QObject, object):
     :type dirty: bool
     :ivar dirty: is set if the tag value has been changed
 
-    :ivar plc_datatype: identifier for the datatype the data is stored in the PLC
+    :ivar plc_datatype: identifier for the datatype the data is stored in the
+                        PLC
 
     :ivar raw_value: the raw PLC value
     """
+    value_changed = pyqtSignal()
 
     def __init__(self, name, address, plc_datatype=None, datatype=float):
         super(Tag, self).__init__()
@@ -36,8 +38,9 @@ class Tag(QObject, object):
     @property
     def value(self):
         """
-        If value is set the new value will be transferred to the PLC the next time the C{poll()} function
-        of the C{BufferedPLCConnector} object is called.
+        If value is set the new value will be transferred to the PLC the next
+        time the C{poll()} function of the C{BufferedPLCConnector} object is
+        called.
 
         """
 
@@ -62,7 +65,7 @@ class Tag(QObject, object):
     @raw_value.setter
     def raw_value(self, value):
         self._raw_value = value
-        self.emit(SIGNAL("value_changed()"))
+        self.value_changed.emit()
 
 
 class ScaledTag(Tag):

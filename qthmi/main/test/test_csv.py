@@ -1,10 +1,5 @@
-import csv
 import unittest
-import sys
 import os
-from PyQt4.QtCore import SIGNAL, QObject
-from PyQt4.QtGui import QWidget, QApplication
-import _csv
 from qthmi.main.connector import AbstractPLCConnector
 from qthmi.main.log import CSVWriter
 from qthmi.main.tag import Tag
@@ -12,6 +7,7 @@ from qthmi.main.tag import Tag
 __author__ = 'Stefan Lehmann'
 
 FILENAME = "test.csv"
+
 
 class RingBufferTestConnector(AbstractPLCConnector):
     def __init__(self):
@@ -37,7 +33,6 @@ class CSVWriter_Test(unittest.TestCase):
 
     def tearDown(self):
         if os.path.exists(FILENAME):
-            #os.remove(FILENAME)
             pass
 
     def test_open_file(self):
@@ -70,3 +65,6 @@ class CSVWriter_Test(unittest.TestCase):
     def test_raise_ioerror_writing_in_closed_file(self):
         self.csvwriter.tags.append(self.tag1)
         self.assertRaises(IOError, self.csvwriter.writerow)
+
+if __name__ == '__main__':
+    unittest.main()

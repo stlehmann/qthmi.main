@@ -3,7 +3,7 @@ __author__ = 'Stefan Lehmann'
 
 import csv
 import time
-from widgets import HMIObject
+from .widgets import HMIObject
 
 
 class CSVWriter(HMIObject):
@@ -30,11 +30,12 @@ class CSVWriter(HMIObject):
         Open file for CSV output.
 
         """
-        self._file = open(filename, "wb")
+        self._file = open(filename, "w")
         self._writer = csv.writer(self._file, self.dialect)
 
-        data = ["Timestamp"]
+        data = ['Timestamp']
         data.extend([tag.name for tag in self.tags])
+
         self._writer.writerow(data)
 
     def close(self):
@@ -62,4 +63,3 @@ class CSVWriter(HMIObject):
         data = [time.time()]
         data.extend([tag.value for tag in self.tags])
         self._writer.writerow(data)
-

@@ -16,10 +16,10 @@ class which implements the model/view pattern used by the Qt framework.
 So this class can be used as a model for QTableView or QListView.
 
 """
-
 from datetime import datetime
-from PyQt4.QtCore import SIGNAL
-from qthmi.main.widgets import HMIObject
+from PyQt5.QtCore import pyqtSignal
+from .widgets import HMIObject
+
 
 __author__ = "Stefan Lehmann"
 SIGNAL_ALARM_RAISED = "alarmRaised(int, QString)"
@@ -87,7 +87,8 @@ class AlarmServer():
     raise, acknowledge and clear them.
 
     :ivar list current_alarms: list of current alarms
-    :ivar dict defined_alarms: dictionary of all defined alarms, key is the alarm number
+    :ivar dict defined_alarms: dictionary of all defined alarms, key is the
+          alarm number
 
     """
     def __init__(self):
@@ -104,7 +105,7 @@ class AlarmServer():
         if active_alarm is None:
             return
         active_alarm.acknowledge()
-    
+
     def acknowledge_all(self):
         """
         Acknowledge all current alarms.
@@ -219,11 +220,10 @@ class AlarmWord(HMIObject):
     :ivar int offset: offset added to the alarm number
 
     """
-
     def __init__(self, tag, alarmserver, offset=0):
         """
-        :param qthmi.main.Alarmserver alarmserver: alarm server with the defined
-            alarms
+        :param qthmi.main.Alarmserver alarmserver: alarm server with the
+            defined alarms
         :param int offset: offset added to the alarm number
 
         """
@@ -234,7 +234,7 @@ class AlarmWord(HMIObject):
         self._reference = 0
         self.offset = offset
 
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
 
     def check(self):
         """
@@ -245,7 +245,6 @@ class AlarmWord(HMIObject):
 
         for bit_nr in range(32):
             bit_n = bit_value(self._value, bit_nr)
-            ref_n = bit_value(self._reference, bit_nr)
 
             if bit_n:
                 self.alarmserver.alarm_coming(self.offset + bit_nr)
@@ -277,7 +276,7 @@ class HMIAckWord(HMIObject):
     def __init__(self, tag):
         HMIObject.__init__(self, tag)
         self._value = 0
-        self.connect(self.tag, SIGNAL("value_changed()"),
+        self.connect(self.tag, pyqtSignal("value_changed()"),
                      self.read_value_from_tag)
 
     @property

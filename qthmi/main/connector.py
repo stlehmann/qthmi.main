@@ -1,11 +1,11 @@
 """
 Abstract class for PLC connection
 """
+from PyQt5.QtCore import QObject, pyqtSignal, QTimer
+
+
 __author__ = 'Stefan Lehmann'
 
-
-from PyQt4.QtCore import QObject, SIGNAL, QTimer
-from util import timeit
 
 class ConnectionError(Exception):
     pass
@@ -22,8 +22,9 @@ def abstractmethod(method):
 
 class AbstractPLCConnector(QObject, object):
     """
-    Connector with buffered PLC access. The access is not done directly via PLC addresses but instead with
-    Tags. Data is exchanged with the PLC when the C{poll()} function is called or C{autopoll} is enabled.
+    Connector with buffered PLC access. The access is not done directly via
+    PLC addresses but instead with Tags. Data is exchanged with the PLC when
+    the C{poll()} function is called or C{autopoll} is enabled.
 
     :type tags: dict
     :ivar tags: holds the Tag objects, the key is the tag name
@@ -31,11 +32,14 @@ class AbstractPLCConnector(QObject, object):
     :type poll_interval: int
     :ivar poll_interval: interval for auto-polling in ms
     """
+
+    polled = pyqtSignal()
+
     def __init__(self):
         super(AbstractPLCConnector, self).__init__()
         self.tags = dict()
         self.autopoll_timer = QTimer(self)
-        self.connect(self.autopoll_timer, SIGNAL("timeout()"), self.poll)
+        self.autopoll_timer.timeout.connect(self.poll)
 
     def add_tag(self, tag):
         """
@@ -71,23 +75,26 @@ class AbstractPLCConnector(QObject, object):
         """
         Exchange data with PLC.
 
-        If a Tag value has been modified in the GUI the value is first written to the PLC and then read again.
+        If a Tag value has been modified in the GUI the value is first written
+        to the PLC and then read again.
 
-        The SIGNAL C{polled()} is emitted when finished.
+        The pyqtSignal C{polled()} is emitted when finished.
 
         """
-
         for tag in self.tags.values():
             try:
                 if tag.dirty:
-                    self.write_to_plc(tag.address, tag.raw_value, tag.plc_datatype)
+                    self.write_to_plc(tag.address, tag.raw_value,
+                                      tag.plc_datatype)
                     tag.dirty = False
 
-                tag.raw_value = self.read_from_plc(tag.address, tag.plc_datatype)
+                tag.raw_value = self.read_from_plc(tag.address,
+                                                   tag.plc_datatype)
 
-            except ConnectionError, e:
-                self.emit(SIGNAL("connectionError"), e.message)
-        self.emit(SIGNAL("polled()"))
+            except ConnectionError as e:
+                self.emit(pyqtSignal("connectionError"), e.message)
+
+        self.polled.emit()
 
     @abstractmethod
     def write_to_plc(self, *args, **kwargs):

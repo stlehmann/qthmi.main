@@ -4,11 +4,9 @@ Created on 28.10.2013
 
 """
 import sys
-
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QWidget, QTableView, QApplication, QPushButton, QVBoxLayout, QSpinBox, QGridLayout, QLabel, QComboBox
-
-from alarmserver.gui import AlarmServerModel
+from PyQt5.QtWidgets import QWidget, QTableView, QApplication, QPushButton, \
+    QGridLayout, QLabel, QComboBox
+from qthmi.main.alarmservermodel import AlarmServerModel
 
 
 class MainWindow(QWidget):
@@ -48,34 +46,35 @@ class MainWindow(QWidget):
         self.setLayout(layout)
         self.resize(600, 300)
 
-        self.connect(self.acknowledgeButton, SIGNAL("pressed()"), self.acknowledge_alarm)
-        self.connect(self.alarmComingButton, SIGNAL("pressed()"), self.alarm_coming)
-        self.connect(self.alarmGoingButton, SIGNAL("pressed()"), self.alarm_going)
-        self.connect(self.acknowledgeAllButton, SIGNAL("pressed()"), self.acknowledge_all)
-        self.connect(self.clearButton, SIGNAL("pressed()"), self.clear_alarm)
-        self.connect(self.clearAllButton, SIGNAL("pressed()"), self.clear_all)
+        self.acknowledgeButton.pressed.connect(self.acknowledge_alarm)
+        self.alarmComingButton.pressed.connect(self.alarm_coming)
+        self.alarmGoingButton.pressed.connect(self.alarm_going)
+        self.acknowledgeAllButton.pressed.connect(self.acknowledge_all)
+        self.clearButton.pressed.connect(self.clear_alarm)
+        self.clearAllButton.pressed.connect(self.clear_all)
 
     def acknowledge_alarm(self):
-        alarm_nr = self.alarmNrComboBox.currentText().toInt()[0]
+        alarm_nr = int(self.alarmNrComboBox.currentText())
         self.alarmserverModel.acknowledge(alarm_nr)
 
     def acknowledge_all(self):
         self.alarmserverModel.acknowledge_all()
 
     def alarm_coming(self):
-        alarm_nr = self.alarmNrComboBox.currentText().toInt()[0]
+        alarm_nr = int(self.alarmNrComboBox.currentText())
         self.alarmserverModel.alarm_coming(alarm_nr)
 
     def alarm_going(self):
-        alarm_nr = self.alarmNrComboBox.currentText().toInt()[0]
+        alarm_nr = int(self.alarmNrComboBox.currentText())
         self.alarmserverModel.alarm_going(alarm_nr)
 
     def clear_alarm(self):
-        alarm_nr = self.alarmNrComboBox.currentText().toInt()[0]
+        alarm_nr = int(self.alarmNrComboBox.currentText())
         self.alarmserverModel.clear(alarm_nr)
 
     def clear_all(self):
         self.alarmserverModel.clear_all()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

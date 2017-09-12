@@ -2,25 +2,22 @@
 Access PLC values via common GUI objects
 
 """
-from matplotlib.backends.qt4_editor.formlayout import QLineEdit
+from PyQt5.QtCore import QEvent, pyqtSignal, QObject, Qt
+from PyQt5.QtWidgets import QDoubleSpinBox, QDialog, QLabel, QComboBox, \
+    QWidget, QPushButton, QHBoxLayout, QSpinBox, QCheckBox, \
+    QLineEdit
+from PyQt5.QtGui import QPixmap
 
-from PyQt4.QtCore import QEvent, SIGNAL, QObject, Qt
-from PyQt4.QtGui import QDoubleSpinBox, QDialog, QLabel, QComboBox, QWidget, \
-    QPushButton, QVBoxLayout, QHBoxLayout, QPixmap, QPicture, QSpinBox, \
-    QCheckBox
-
-from input import NumPad
-from qthmi.main.connector import abstractmethod
-from resources_rc import *
+from .input import NumPad
+from .connector import abstractmethod
+from . import resources_rc
 
 
 class HMIObject(QObject):
-
     """
     Basic HMI class
 
     """
-
     def __init__(self, tag=None, parent=None):
         super(HMIObject, self).__init__(parent)
         self.tag = tag
@@ -46,15 +43,14 @@ class HMIWidget(HMIObject, QWidget):
 
 
 class HMISpinBox(QSpinBox, HMIObject):
+
     def __init__(self, tag=None, parent=None):
         super(HMISpinBox, self).__init__(tag, parent)
         self.lineEdit().installEventFilter(self)
         self.setButtonSymbols(QDoubleSpinBox.NoButtons)
         if tag is not None:
-            self.connect(self.tag, SIGNAL("value_changed()"),
-                         self.read_value_from_tag)
-            self.connect(self, SIGNAL("valueChanged(double)"),
-                         self.write_value_to_tag)
+            self.tag.value_changed.connect(self.read_value_from_tag)
+            self.valueChanged.connect(self.write_value_to_tag)
 
     def eventFilter(self, *args, **kwargs):
         sender = args[0]
@@ -78,13 +74,14 @@ class HMISpinBox(QSpinBox, HMIObject):
 
 
 class HMIDoubleSpinBox(QDoubleSpinBox, HMIObject):
+
     def __init__(self, tag=None, parent=None):
         super(HMIDoubleSpinBox, self).__init__(tag, parent)
         self.lineEdit().installEventFilter(self)
         self.setButtonSymbols(QDoubleSpinBox.NoButtons)
 
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
-        self.connect(self, SIGNAL("valueChanged(double)"), self.write_value_to_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
+        self.valueChanged.connect(self.write_value_to_tag)
 
     def eventFilter(self, *args, **kwargs):
         sender = args[0]
@@ -109,10 +106,11 @@ class HMIDoubleSpinBox(QDoubleSpinBox, HMIObject):
 
 
 class HMIComboBox(QComboBox, HMIObject):
+
     def __init__(self, tag=None, parent=None):
         super(HMIComboBox, self).__init__(tag, parent)
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
-        self.connect(self, SIGNAL("currentIndexChanged(int)"), self.write_value_to_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
+        self.currentIndexChanged.connect(self.write_value_to_tag)
         self._index_changed_first_time = True
 
     def read_value_from_tag(self):
@@ -125,10 +123,11 @@ class HMIComboBox(QComboBox, HMIObject):
 
 
 class HMILabel(QLabel, HMIObject):
+
     def __init__(self, tag=None, parent=None, format_spec="{:03.3f}"):
         super(HMILabel, self).__init__(tag, parent)
         self.format_spec = format_spec
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
 
     def read_value_from_tag(self):
         value = self.tag.value
@@ -139,10 +138,11 @@ class HMILabel(QLabel, HMIObject):
 
 
 class HMILineEdit(QLineEdit, HMIObject):
+
     def __init__(self, tag=None, parent=None):
         super(HMILineEdit, self).__init__(tag, parent)
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
-        self.connect(self, SIGNAL("textEdited(QString)"), self.write_value_to_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
+        self.textEdited.connect(self.write_value_to_tag)
 
     def read_value_from_tag(self):
         self.setText(self.tag.value)
@@ -152,12 +152,13 @@ class HMILineEdit(QLineEdit, HMIObject):
 
 
 class HMIPushButton(QPushButton, HMIObject):
+
     def __init__(self, tag=None, parent=None):
         super(HMIPushButton, self).__init__(tag, parent)
 
         QPushButton.setCheckable(self, True)
-        self.connect(self, SIGNAL("toggled(bool)"), self.write_value_to_tag)
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
+        self.toggled.connect(self.write_value_to_tag)
         self._checkable = False
         self._next_time_uncheck = False
 
@@ -183,8 +184,8 @@ class HMITextMapper(HMIObject):
     :ivar text_definitions: defined pairs of numeric values and text messages
 
     :type text: basestring
-    :ivar text: Corresponding text message to the current tag value. Empty if no text for the given
-                key is defined.
+    :ivar text: Corresponding text message to the current tag value. Empty if
+                no text for the given key is defined.
 
     """
 
@@ -192,8 +193,7 @@ class HMITextMapper(HMIObject):
         super(HMITextMapper, self).__init__(tag, parent)
         self.text_definitions = {}
         self.text = ""
-
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
 
     def add_text(self, key, text):
         """
@@ -231,29 +231,29 @@ class HMIIndicator(QWidget, HMIObject):
 
     def __init__(self, tag, parent=None):
         super(HMIIndicator, self).__init__(tag, parent)
-        self.connect(self.tag, SIGNAL("value_changed()"), self.read_value_from_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
 
-        #Indicator images
-        #----------------------------------------------------
+        # Indicator images
+        # ----------------------------------------------------
         self.indicator_on = QPixmap(":/img/circle_green.png")
         self.indicator_off = QPixmap(":/img/circle_grey.png")
 
-        #Text label
-        #----------------------------------------------------
+        # Text label
+        # ----------------------------------------------------
         self.text_label = QLabel(tag.name)
         font = self.text_label.font()
         font.setPointSize(12)
         self.text_label.setFont(font)
 
-        #Indicator label
-        #----------------------------------------------------
+        # Indicator label
+        # ----------------------------------------------------
         self.indicator_label = QLabel()
         self.indicator_label.setScaledContents(True)
         self.indicator_label.setFixedSize(22, 22)
         self.indicator_label.setPixmap(self.indicator_off)
 
-        #Layout
-        #----------------------------------------------------
+        # Layout
+        # ----------------------------------------------------
         layout = QHBoxLayout()
         layout.addWidget(self.indicator_label)
         layout.addWidget(self.text_label)
@@ -278,13 +278,10 @@ class HMICheckBox(QCheckBox, HMIObject):
     Checkbox for displaying and switching a boolean tag.
 
     """
-
     def __init__(self, tag=None, parent=None):
         super(HMICheckBox, self).__init__(tag, parent)
-        self.connect(self.tag, SIGNAL("value_changed()"),
-                     self.read_value_from_tag)
-        self.connect(self, SIGNAL("stateChanged(int)"),
-                     self.write_value_to_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
+        self.stateChanged.connect(self.write_value_to_tag)
 
     def read_value_from_tag(self):
         self.setCheckState(Qt.Checked if self.tag.value else Qt.Unchecked)

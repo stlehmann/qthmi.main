@@ -8,7 +8,7 @@ from qthmi.main.tag import Tag, TextTag
 class RingBufferTestConnector(AbstractPLCConnector):
     def __init__(self):
         super(RingBufferTestConnector, self).__init__()
-        self.ringbuffer = range(100)
+        self.ringbuffer = list(range(100))
 
     def read_from_plc(self, address, datatype):
         return self.ringbuffer[address]
@@ -72,3 +72,6 @@ class BufferConnector_Test(unittest.TestCase):
         self.buffer.poll()
         self.assertEqual(self.buffer.tags["first tag"].value, 10)
 
+
+if __name__ == '__main__':
+   unittest.main()
