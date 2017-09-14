@@ -47,7 +47,6 @@ class AbstractPLCConnector(QObject, object):
         :type tag: Tag
         :return: tag
         """
-
         self.tags[tag.name] = tag
         return tag
 
@@ -57,7 +56,7 @@ class AbstractPLCConnector(QObject, object):
         :param list/tuple tags: a list of tags
 
         """
-        map(self.add_tag, tags)
+        list(map(self.add_tag, tags))
 
     @property
     def cycletime(self):

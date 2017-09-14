@@ -2,7 +2,7 @@
 Access PLC values via common GUI objects
 
 """
-from PyQt5.QtCore import QEvent, pyqtSignal, QObject, Qt
+from PyQt5.QtCore import QEvent, QObject, Qt
 from PyQt5.QtWidgets import QDoubleSpinBox, QDialog, QLabel, QComboBox, \
     QWidget, QPushButton, QHBoxLayout, QSpinBox, QCheckBox, \
     QLineEdit
@@ -10,6 +10,7 @@ from PyQt5.QtGui import QPixmap
 
 from .input import NumPad
 from .connector import abstractmethod
+from .util import string_to_float
 from . import resources_rc
 
 
@@ -60,9 +61,8 @@ class HMISpinBox(QSpinBox, HMIObject):
             if self.isEnabled() and not self.isReadOnly():
                 numpad = NumPad(self, sender.text())
                 if numpad.exec_() == QDialog.Accepted:
-                    (newValue, b) = numpad.outputLineEdit.text().toDouble()
-                    if b:
-                        self.setValue(newValue)
+                    newValue = string_to_float(numpad.outputLineEdit.text())
+                    self.setValue(newValue)
 
         return QDoubleSpinBox.eventFilter(self, *args, **kwargs)
 
@@ -91,10 +91,9 @@ class HMIDoubleSpinBox(QDoubleSpinBox, HMIObject):
             if self.isEnabled() and not self.isReadOnly():
                 numpad = NumPad(self, sender.text())
                 if numpad.exec_() == QDialog.Accepted:
-                    (newValue, b) = numpad.outputLineEdit.text().toDouble()
-                    if b:
-                        self.setValue(newValue)
-                        self.valueChanged.emit(newValue)
+                    newValue = string_to_float(numpad.outputLineEdit.text())
+                    self.setValue(newValue)
+                    self.valueChanged.emit(newValue)
 
         return QDoubleSpinBox.eventFilter(self, *args, **kwargs)
 

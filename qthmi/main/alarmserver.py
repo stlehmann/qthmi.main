@@ -276,8 +276,7 @@ class HMIAckWord(HMIObject):
     def __init__(self, tag):
         HMIObject.__init__(self, tag)
         self._value = 0
-        self.connect(self.tag, pyqtSignal("value_changed()"),
-                     self.read_value_from_tag)
+        self.tag.value_changed.connect(self.read_value_from_tag)
 
     @property
     def value(self):

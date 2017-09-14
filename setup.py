@@ -1,8 +1,7 @@
 from setuptools import setup, find_packages
-from qthmi import __VERSION__
 
 
-version = __VERSION__
+version = '0.2.0'
 
 
 setup(
