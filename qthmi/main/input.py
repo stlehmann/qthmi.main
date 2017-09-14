@@ -25,8 +25,9 @@ class NumPad (QDialog, Ui_numPad):
         super(NumPad, self).__init__(parent)
         self.setupUi(self)
 
-        suffixIndex = text.index(" ")
-        if suffixIndex == -1:
+        try:
+            suffixIndex = text.index(" ")
+        except ValueError:
             self.outputLineEdit.setText(text)
         else:
             self.outputLineEdit.setText(text[:suffixIndex])
