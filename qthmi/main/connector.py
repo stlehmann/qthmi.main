@@ -34,6 +34,7 @@ class AbstractPLCConnector(QObject, object):
     """
 
     polled = pyqtSignal()
+    connectionError = pyqtSignal(str)
 
     def __init__(self):
         super(AbstractPLCConnector, self).__init__()
@@ -91,7 +92,7 @@ class AbstractPLCConnector(QObject, object):
                                                    tag.plc_datatype)
 
             except ConnectionError as e:
-                self.emit(pyqtSignal("connectionError"), e.message)
+                self.connectionError.emit(str(e))
 
         self.polled.emit()
 
