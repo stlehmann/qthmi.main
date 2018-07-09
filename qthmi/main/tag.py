@@ -1,12 +1,19 @@
+""" Tag module.
+
+:author: Stefan Lehmann <stlm@posteo.de>
+:license: MIT, see license file or https://opensource.org/licenses/MIT
+
+:created on 2018-06-11 18:16:58
+:last modified by:   Stefan Lehmann
+:last modified time: 2018-07-09 14:13:53
+
+"""
 from PyQt5.QtCore import QObject, pyqtSignal
-
-
-__author__ = 'Stefan Lehmann'
 
 
 class Tag(QObject, object):
     """
-    An instance of Tag represents a buffered connection between GUI and PLC
+    An instance of Tag represents a buffered connection between GUI and PLC.
 
     :type name: str
     :ivar name: tag name
@@ -23,10 +30,14 @@ class Tag(QObject, object):
                         PLC
 
     :ivar raw_value: the raw PLC value
+
     """
+
     value_changed = pyqtSignal()
 
-    def __init__(self, name, address, plc_datatype=None, datatype=float):
+    def __init__(
+        self, name: str, address: int, plc_datatype: int = None, datatype: type = float
+    ) -> None:
         super(Tag, self).__init__()
         self.name = name
         self.address = address
@@ -117,6 +128,7 @@ class TextTag(Tag):
     Tag that supplies defined texts constraint to integer values
 
     """
+
     def __init__(self, name, address, plc_datatype=None):
         super(TextTag, self).__init__(name, address, plc_datatype)
         self.datatype = int

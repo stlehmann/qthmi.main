@@ -5,7 +5,7 @@
 
 :created on 2018-06-11 18:16:58
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-07-09 14:05:27
+:last modified time: 2018-07-09 16:06:14
 
 """
 from typing import Any, Dict
@@ -60,8 +60,8 @@ class HMIWidget(HMIObject, QWidget):
 class HMISpinBox(QSpinBox, HMIObject):
     """SpinBox for reading and writing a tag value."""
 
-    def __init__(self, tag: Tag, parent: QWidget = None) -> None:
-        super(HMISpinBox, self).__init__(tag, parent)
+    def __init__(self, tag: Tag, parent: QWidget=None) -> None:
+        HMIObject.__init__(self, tag, parent)
 
         self.lineEdit().installEventFilter(self)
         self.setButtonSymbols(QDoubleSpinBox.NoButtons)
@@ -96,7 +96,8 @@ class HMIDoubleSpinBox(QDoubleSpinBox, HMIObject):
     """DoubleSpinBox for reading and writing a tag value."""
 
     def __init__(self, tag: Tag, parent: QWidget = None) -> None:
-        super(HMIDoubleSpinBox, self).__init__(tag, parent)
+        HMIObject.__init__(self, tag, parent)
+
         self.lineEdit().installEventFilter(self)
         self.setButtonSymbols(QDoubleSpinBox.NoButtons)
 
@@ -131,7 +132,7 @@ class HMIComboBox(QComboBox, HMIObject):
     """ComboBox for reading and writing a tag value."""
 
     def __init__(self, tag: Tag, parent: QWidget = None) -> None:
-        super(HMIComboBox, self).__init__(tag, parent)
+        HMIObject.__init__(self, tag, parent)
 
         self.tag.value_changed.connect(self.read_value_from_tag)
         self.currentIndexChanged.connect(self.write_value_to_tag)
@@ -267,7 +268,7 @@ class HMIIndicator(QWidget, HMIObject):
     """Indicator light to display state of a bool tag."""
 
     def __init__(self, tag: Tag, parent: QWidget=None) -> None:
-        super(HMIIndicator, self).__init__(tag, parent)
+        HMIObject.__init__(self, tag, parent)
         self.tag.value_changed.connect(self.read_value_from_tag)
 
         # Indicator images

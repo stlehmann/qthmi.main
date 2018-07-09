@@ -1,6 +1,4 @@
-"""
-Realtime data plotting
-======================
+"""Realtime data plotting.
 
 Plot PLC data in Realtime.
 
