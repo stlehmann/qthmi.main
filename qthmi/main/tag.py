@@ -1,14 +1,18 @@
-""" Tag module.
+"""Tag module.
 
 :author: Stefan Lehmann <stlm@posteo.de>
 :license: MIT, see license file or https://opensource.org/licenses/MIT
 
 :created on 2018-06-11 18:16:58
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-07-09 14:13:53
+:last modified time: 2018-07-09 17:02:19
 
 """
+from typing import Any, Optional, Dict
 from PyQt5.QtCore import QObject, pyqtSignal
+
+
+RAW_VALUE_TYPE = Any
 
 
 class Tag(QObject, object):
@@ -44,44 +48,40 @@ class Tag(QObject, object):
         self.datatype = datatype
         self.dirty = False
         self.plc_datatype = plc_datatype
-        self._raw_value = None
+        self._raw_value: Any = None
 
     @property
-    def value(self):
-        """
+    def value(self) -> Any:
+        """Return value.
+
         If value is set the new value will be transferred to the PLC the next
         time the C{poll()} function of the C{BufferedPLCConnector} object is
         called.
 
         """
-
         if self.raw_value is None:
             return
 
         return self.datatype(self._raw_value)
 
     @value.setter
-    def value(self, value):
+    def value(self, value: Any) -> None:
         self._raw_value = value
         self.dirty = True
 
     @property
-    def raw_value(self):
-        """
-        The raw PLC value
-
-        """
+    def raw_value(self) -> Any:
+        """Return the raw PLC value."""
         return self._raw_value
 
     @raw_value.setter
-    def raw_value(self, value):
+    def raw_value(self, value: Any) -> None:
         self._raw_value = value
         self.value_changed.emit()
 
 
 class ScaledTag(Tag):
-    """
-    Tag that supplies a converted, scaled and offset value
+    """Tag that supplies a converted, scaled and offset value.
 
         >>> tag = ScaledTag("scaled_tag", 0)
         >>> tag.scale_factor = 2
@@ -98,46 +98,47 @@ class ScaledTag(Tag):
 
     """
 
-    def __init__(self, name, address, plc_datatype=None, datatype=float):
+    def __init__(
+        self, name: str, address: int, plc_datatype: int = None, datatype: type = float
+    ) -> None:
         super(ScaledTag, self).__init__(name, address, plc_datatype, datatype)
         self.scale_factor = 1
         self.scale_offset = 0
 
     @property
-    def value(self):
-        """
-        converted, scaled and offset value for use in GUI
+    def value(self) -> Optional[float]:
+        """Return converted, scaled and offset value for use in GUI.
 
         If value is set the new value will be transferred to the PLC the
         next time the C{poll()} function of the C{BufferedPLCConnector}
         object is called.
 
         """
-        value = self._raw_value * self.scale_factor + self.scale_offset
-        value = self.datatype(value)
+        if self._raw_value is not None:
+            value = self._raw_value * self.scale_factor + self.scale_offset
+            value = self.datatype(value)
+        else:
+            value = None
+
         return value
 
     @value.setter
-    def value(self, value):
+    def value(self, value: float) -> None:
         self._raw_value = (value - self.scale_offset) / self.scale_factor
         self.dirty = True
 
 
 class TextTag(Tag):
-    """
-    Tag that supplies defined texts constraint to integer values
+    """Tag that supplies defined texts constraint to integer values."""
 
-    """
-
-    def __init__(self, name, address, plc_datatype=None):
+    def __init__(self, name: str, address: int, plc_datatype: int=None) -> None:
         super(TextTag, self).__init__(name, address, plc_datatype)
         self.datatype = int
-        self.text_definitions = {}
+        self.text_definitions: Dict[int, str] = {}
         self.text = ""
 
-    def add_text(self, key, text):
-        """
-        Add a text message definition
+    def add_text(self, key: int, text: str) -> None:
+        """Add a text message definition.
 
         :param key: Tag value as key
 
@@ -147,21 +148,26 @@ class TextTag(Tag):
         """
         self.text_definitions[key] = text
 
-    def pop_text(self, key):
-        """
-        Remove text message for the given key.
+    def pop_text(self, key: int) -> str:
+        """Remove text message for the given key.
 
         :param key: Tag value as key
         :return: text message
         """
         return self.text_definitions.pop(key)
 
-    def get_text(self, key):
+    def get_text(self, key: int) -> str:
+        """Return text for the given key."""
         text = self.text_definitions.get(key)
         if text is None:
             text = ""
         return text
 
-    @Tag.value.getter
-    def value(self):
+    @property
+    def value(self) -> str:
+        """Return the current text value."""
         return self.get_text(self.raw_value)
+
+    @value.setter  # just a dummy setter to avoid mypy error
+    def value(self, value: str) -> None:
+        pass
