@@ -5,7 +5,7 @@
 
 :created on 2018-06-11 18:16:58
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-07-09 16:06:14
+:last modified time: 2018-07-10 08:49:19
 
 """
 from typing import Any, Dict
@@ -79,7 +79,7 @@ class HMISpinBox(QSpinBox, HMIObject):
                 numpad = NumPad(self, sender.text())
                 if numpad.exec_() == QDialog.Accepted:
                     newValue = string_to_float(numpad.outputLineEdit.text())
-                    self.setValue(newValue)
+                    self.setValue(int(newValue))
 
         return QDoubleSpinBox.eventFilter(self, *args, **kwargs)
 

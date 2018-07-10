@@ -1,29 +1,34 @@
-# -*-coding: utf-8 -*-
+"""Widgets for user input via TouchScreen.
+
+:author: Stefan Lehmann <stlm@posteo.de>
+:license: MIT, see license file or https://opensource.org/licenses/MIT
+
+:created on 2018-06-11 18:16:58
+:last modified by:   Stefan Lehmann
+:last modified time: 2018-07-10 08:47:22
+
 """
-Widgets for user input via TouchScreen
-"""
-from PyQt5.QtCore import QSignalMapper
+from PyQt5.QtCore import QSignalMapper, pyqtSlot
 from PyQt5.QtGui import QDoubleValidator
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QWidget
 from .ui_numpad import Ui_numPad
 from .util import string_remove_by_index, string_insert
 
 
-__author__ = "Stefan Lehmann"
 DECIMAL_SEPARATOR = ","
 
 
-class NumPad (QDialog, Ui_numPad):
-    """
-    @summary: Nummernblock, welcher auf dem Bildschirm erscheint. Ermöglicht
-    die Eingabe von Zahlen auf einem Touchscreen
+class NumPad(QDialog, Ui_numPad):
+    """Numpad for user input.
+
+    Enables the user to insert numbers on a touchscreen.
 
     """
 
-    def __init__(self, parent=None, text=""):
+    def __init__(self, parent: QWidget=None, text: str="") -> None:
 
         super(NumPad, self).__init__(parent)
-        self.setupUi(self)
+        self.setupUi(self)  # type: ignore
 
         try:
             suffixIndex = text.index(" ")
@@ -70,7 +75,9 @@ class NumPad (QDialog, Ui_numPad):
         doubleValidator = QDoubleValidator()
         self.outputLineEdit.setValidator(doubleValidator)
 
-    def button_pressed(self, value):
+    @pyqtSlot(int)
+    def button_pressed(self, value: int) -> None:
+        """Handle a pressed button."""
         cursor_position = self.outputLineEdit.cursorPosition()
 
         # Bei markierten Zeichen diese löschen
@@ -105,13 +112,10 @@ class NumPad (QDialog, Ui_numPad):
                 if DECIMAL_SEPARATOR not in self.outputLineEdit.text():
                     self.outputLineEdit.setText(
                         string_insert(self.outputLineEdit.text(),
-                                      value, cursor_position)
+                                      str(value), cursor_position)
                     )
             else:
                 self.outputLineEdit.setText(
-                    string_insert(self.outputLineEdit.text(), value,
+                    string_insert(self.outputLineEdit.text(), str(value),
                                   cursor_position)
                 )
-
-    def outputLineEdit_focusOutEvent(self, e):
-        pass

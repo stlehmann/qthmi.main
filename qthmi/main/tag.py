@@ -5,7 +5,7 @@
 
 :created on 2018-06-11 18:16:58
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-07-09 17:02:19
+:last modified time: 2018-07-10 07:51:04
 
 """
 from typing import Any, Optional, Dict
@@ -16,8 +16,7 @@ RAW_VALUE_TYPE = Any
 
 
 class Tag(QObject, object):
-    """
-    An instance of Tag represents a buffered connection between GUI and PLC.
+    """An instance of Tag represents a buffered connection between GUI and PLC.
 
     :type name: str
     :ivar name: tag name
@@ -153,6 +152,7 @@ class TextTag(Tag):
 
         :param key: Tag value as key
         :return: text message
+
         """
         return self.text_definitions.pop(key)
 
