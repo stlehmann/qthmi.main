@@ -5,15 +5,32 @@
 
 :created on 2018-06-11 18:16:58
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-07-10 13:49:46
+:last modified time: 2018-07-10 15:59:52
 
 """
-from typing import List, Optional, TextIO
+from abc import abstractmethod, abstractproperty
+from typing import List, Optional, TextIO, cast, Union
 import csv
 import time
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QWidget
 from .tag import Tag
+
+
+class _CSVWriter:
+    """Helper class for type-annotation."""
+
+    @abstractmethod
+    def writerow(self, row: List[str]) -> None:
+        pass
+
+    @abstractmethod
+    def writerows(self, rows: List[str]) -> None:
+        pass
+
+    @abstractproperty
+    def dialect(self) -> csv.Dialect:
+        pass
 
 
 class CSVWriter(QObject):
@@ -32,13 +49,13 @@ class CSVWriter(QObject):
 
         self.tags: List[Tag] = []
         self._file: Optional[TextIO] = None
-        self._writer: Optional["_writer"] = None
+        self._writer: Optional[_CSVWriter] = None
         self.dialect = dialect
 
     def open(self, filename: str) -> None:
         """Open file for CSV output."""
         self._file = open(filename, "w")
-        self._writer = csv.writer(self._file, self.dialect)
+        self._writer = cast(_CSVWriter, csv.writer(self._file, self.dialect))
 
         data = ['Timestamp']
         data.extend([tag.name for tag in self.tags])
@@ -75,4 +92,4 @@ class CSVWriter(QObject):
 
         data = [time.time()]
         data.extend([tag.value for tag in self.tags])
-        self._writer.writerow(data)
+        self._writer.writerow([str(x) for x in data])

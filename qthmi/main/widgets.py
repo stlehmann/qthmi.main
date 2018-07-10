@@ -5,7 +5,7 @@
 
 :created on 2018-06-11 18:16:58
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-07-10 08:49:19
+:last modified time: 2018-07-10 14:21:28
 
 """
 from typing import Any, Dict
@@ -220,8 +220,7 @@ class HMIPushButton(QPushButton, HMIObject):
 
 
 class HMITextMapper(HMIObject):
-    """
-    Map text messages to keys.
+    """Map text messages to keys.
 
     :type text_definitions: dict
     :ivar text_definitions: defined pairs of numeric values and text messages
