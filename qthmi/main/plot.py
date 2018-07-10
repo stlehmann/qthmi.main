@@ -29,78 +29,115 @@ The HMIPlot object is inherited from C{QWidget} and can be displayed on its own
 by calling the C{show()} function or embedded in a second QWidget object.
 
 """
-from datetime import datetime
+from typing import List, Optional
+from datetime import datetime, timedelta
 import pylab
-from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from qthmi.main.widgets import HMIWidget
+from matplotlib.lines import Line2D
+from .connector import AbstractPLCConnector
+from .widgets import HMIWidget
+from .tag import Tag
 
 
 __author__ = "Stefan Lehmann"
 
 
-class Observer(HMIWidget):
-    """
-    Binding object between a Tag and HMIPlot
+class BaseObserver(HMIWidget):
+    """Base Observer class."""
 
-    """
-
-    def __init__(self, tag, buffer_size=100, label="", ax=0, style="-"):
-        super(Observer, self).__init__()
+    def __init__(
+        self,
+        tag: Tag,
+        buffer_size: int = 100,
+        label: str = "",
+        ax: int = 0,
+        plot_style: str = "-",
+    ) -> None:
+        super().__init__(tag)
         self.buffer_size = buffer_size
-        self.y = []
-        self.x = []
         self.tag = tag
         self.label = tag.name if label == "" else label
         self.ax = ax
-        self.style = style
-        self.starttime = None
-
-    def read_value_from_tag(self):
-        self.x.append(datetime.now())
-        self.y.append(self.tag.value)
-
-        if len(self.x) > self.buffer_size:
-            self.x = self.x[-self.buffer_size:]
-            self.y = self.y[-self.buffer_size:]
-
-    def write_value_to_tag(self):
-        pass
+        self.plot_style = plot_style
+        self.starttime: Optional[datetime] = None
 
 
-class TimeDeltaObserver(Observer):
+class Observer(BaseObserver):
+    """Binding object between a Tag and HMIPlot."""
 
-    def read_value_from_tag(self):
-        if len(self.x) == 0:
+    def __init__(
+        self,
+        tag: Tag,
+        buffer_size: int = 100,
+        label: str = "",
+        ax: int = 0,
+        plot_style: str = "-",
+    ) -> None:
+        super().__init__(tag)
+        self.x_vals: List[datetime] = []
+        self.y_vals: List[float] = []
+
+    def read_value_from_tag(self) -> None:
+        """Read value from tag."""
+        self.x_vals.append(datetime.now())
+        self.y_vals.append(self.tag.value)
+
+        if len(self.x_vals) > self.buffer_size:
+            self.x_vals = self.x_vals[-self.buffer_size:]
+            self.y_vals = self.y_vals[-self.buffer_size:]
+
+
+class TimeDeltaObserver(BaseObserver):
+    """Observer for time differences."""
+
+    def __init__(
+        self,
+        tag: Tag,
+        buffer_size: int = 100,
+        label: str = "",
+        ax: int = 0,
+        plot_style: str = "-",
+    ) -> None:
+        super().__init__(tag)
+        self.x_vals: List[float] = []
+        self.y_vals: List[float] = []
+
+    def read_value_from_tag(self) -> None:
+        """Read value from tag."""
+        if len(self.x_vals) == 0:
             self.starttime = datetime.now()
 
-        delta = datetime.now() - self.starttime
-        self.x.append(delta.total_seconds())
-        self.y.append(self.tag.value)
+        if self.starttime is not None:
+            delta = datetime.now() - self.starttime
+        else:
+            delta = timedelta(0)
 
-        if len(self.x) > self.buffer_size:
-            self.x = self.x[-self.buffer_size:]
-            self.y = self.y[-self.buffer_size:]
+        self.x_vals.append(delta.total_seconds())
+        self.y_vals.append(self.tag.value)
+
+        if len(self.x_vals) > self.buffer_size:
+            self.x_vals = self.x_vals[-self.buffer_size:]
+            self.y_vals = self.y_vals[-self.buffer_size:]
 
 
-class HMIPlot (QWidget, object):
-    """
-    Realtime Plot
+class HMIPlot(QWidget, object):
+    """Realtime Plot.
 
-    :type connector: connector.PLCConnector
     :ivar connector: connector instance for plc communication
     """
-    def __init__(self, connector, parent=None, buffer_size=100):
-        """
-        :type connector: qthmi.main.connector.AbstractPLCConnector
 
-        """
+    def __init__(
+        self,
+        connector: AbstractPLCConnector,
+        parent: QWidget = None,
+        buffer_size: int = 100,
+    ) -> None:
         super(HMIPlot, self).__init__(parent)
         self.connector = connector
         self.buffer_size = buffer_size
-        self.observers = []
-        self.lines = []
+        self.observers: List[Observer] = []
+        self.lines: List[Line2D] = []
 
         # Init matplotlib objects
         # ----------------------------------------------------
@@ -116,38 +153,33 @@ class HMIPlot (QWidget, object):
 
         self.connector.polled.connect(self.refresh)
 
-    def add_observer(self, observer):
-        """
-        Add observer to HMIPlot.
-        :type observer: Observer
-
-        """
+    def add_observer(self, observer: Observer) -> None:
+        """Add observer to HMIPlot."""
         self.observers.append(observer)
 
         self.lines.append(
-            self.axes[observer.ax].plot([], [], observer.style,
-                                        label=observer.label)[0])
-
-    def autoscale_xaxis(self):
-        self.axes[0].set_xlim(
-            datetime.datetime.now() - datetime.timedelta(
-                milliseconds=self.buffer_size * self.connector.cycletime),
-            datetime.datetime.now()
+            self.axes[observer.ax].plot([], [], observer.style, label=observer.label)[0]
         )
 
-    def refresh(self):
-        """
-        Plot current data.
+    def autoscale_xaxis(self) -> None:
+        """Autoscale x axis."""
+        self.axes[0].set_xlim(
+            datetime.now()
+            - timedelta(milliseconds=self.buffer_size * self.connector.cycletime),
+            datetime.now(),
+        )
 
-        """
+    def refresh(self) -> None:
+        """Plot current data."""
         prim_observer = self.observers[0]
-        if len(prim_observer.x) > 1:
-            self.axes[0].set_xlim(prim_observer.x[0], prim_observer.x[-1])
+        if len(prim_observer.x_list) > 1:
+            self.axes[0].set_xlim(prim_observer.x_list[0], prim_observer.x_list[-1])
 
         for i, observer in enumerate(self.observers):
             observer.read_value_from_tag()
-            self.lines[i].set_data(observer.x, observer.y)
+            self.lines[i].set_data(observer.x_list, observer.y_list)
         self.draw()
 
-    def draw(self):
+    def draw(self) -> None:
+        """Draw the canvas."""
         self.canvas.draw()

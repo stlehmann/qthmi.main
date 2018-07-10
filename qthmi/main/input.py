@@ -5,7 +5,7 @@
 
 :created on 2018-06-11 18:16:58
 :last modified by:   Stefan Lehmann
-:last modified time: 2018-07-10 08:47:22
+:last modified time: 2018-07-10 13:50:21
 
 """
 from PyQt5.QtCore import QSignalMapper, pyqtSlot
@@ -67,7 +67,7 @@ class NumPad(QDialog, Ui_numPad):
         self.buttonDecimal.pressed.connect(self.signal_mapper.map)
         self.buttonDel.pressed.connect(self.signal_mapper.map)
 
-        self.signal_mapper.mapped[str].connect(self.button_pressed)
+        self.signal_mapper.mapped[str].connect(self.button_pressed)  # type: ignore
         self.buttonOK.pressed.connect(self.accept)
         self.buttonCancel.pressed.connect(self.close)
         self.outputLineEdit.focusOutEvent = self.outputLineEdit_focusOutEvent
