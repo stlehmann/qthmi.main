@@ -1,14 +1,18 @@
-"""
-Model for alarm handling
+"""Model for alarm handling.
+
+:author: Stefan Lehmann <stlm@posteo.de>
+:license: MIT, see license file or https://opensource.org/licenses/MIT
+
+:created on 2018-06-11 18:16:58
+:last modified by:   Stefan Lehmann
+:last modified time: 2018-07-10 10:05:34
 
 """
+from typing import Any
 from PyQt5.QtGui import QColor
-from PyQt5.QtCore import QAbstractTableModel, Qt, QVariant, QModelIndex, \
-    pyqtSignal
+from PyQt5.QtCore import QAbstractTableModel, Qt, QVariant, QModelIndex, pyqtSignal
 from .alarmserver import AlarmServer, AlarmNotDefinedError
 
-
-__author__ = "Stefan Lehmann"
 
 ALARM_NR = 0
 ALARM_TEXT = 1
@@ -20,19 +24,21 @@ TIME_PATTERN = "%H:%M:%S"
 
 
 class AlarmServerModel(QAbstractTableModel, AlarmServer):
-    """
+    """Model for access to AlarmServer.
+
     This class allows the user access to the alarm server via
     the model/view mechanism of the Qt framework.
 
     """
+
     dataChanged = pyqtSignal(QModelIndex, QModelIndex)
     alarm_acknowledged = pyqtSignal(int)
 
-    def __init__(self):
+    def __init__(self) -> None:
         AlarmServer.__init__(self)
         super(AlarmServerModel, self).__init__()
 
-    def _dataChanged_signal(self, alarm_nr):
+    def _dataChanged_signal(self, alarm_nr: int) -> None:
         alarm = self.defined_alarms.get(alarm_nr)
 
         if alarm is None:
@@ -44,29 +50,25 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             indexBottomRight = self.index(row, COLUMN_COUNT - 1, QModelIndex())
             self.dataChanged.emit(indexTopLeft, indexBottomRight)
 
-    def acknowledge(self, alarm_nr):
-        """
-        Acknowledge the current alarm with the given number
-        and emit a signal 'alarm_acknowledged'
+    def acknowledge(self, alarm_nr: int) -> None:
+        """Acknowledge the current alarm with the given number.
+
+        Emit a signal 'alarm_acknowledged'.
 
         """
-
         AlarmServer.acknowledge(self, alarm_nr)
         self._dataChanged_signal(alarm_nr)
         self.alarm_acknowledged.emit(alarm_nr)
 
-    def acknowledge_all(self):
-        """
-        Acknowledge all current alarms.
-
-        """
-
+    def acknowledge_all(self) -> None:
+        """Acknowledge all current alarms."""
         self.beginResetModel()
         for alarm in self.current_alarms:
             self.acknowledge(alarm.alarm_nr)
         self.endResetModel()
 
-    def alarm_coming(self, alarm_nr):
+    def alarm_coming(self, alarm_nr: int) -> None:
+        """Set the alarm with the given number to active."""
         alarm = self.defined_alarms.get(alarm_nr)
         if alarm is None:
             raise AlarmNotDefinedError(alarm_nr)
@@ -80,23 +82,17 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             self.dataChanged.emit(indexTopLeft, indexBottomRight)
         else:
             alarm_count = len(self.current_alarms)
-            self.beginInsertRows(
-                QModelIndex(), alarm_count - 1, alarm_count - 1
-            )
+            self.beginInsertRows(QModelIndex(), alarm_count - 1, alarm_count - 1)
             AlarmServer.alarm_coming(self, alarm_nr)
             self.endInsertRows()
 
-    def alarm_going(self, alarm_nr):
+    def alarm_going(self, alarm_nr: int) -> None:
+        """Set the alarm with the given number to inactive."""
         AlarmServer.alarm_going(self, alarm_nr)
         self._dataChanged_signal(alarm_nr)
 
-    def clear(self, alarm_nr):
-        """
-        Clear the current alarm.
-
-        :param int alarm_nr: number of the alarm
-
-        """
+    def clear(self, alarm_nr: int) -> None:
+        """Clear the given alarm."""
         alarm = self.defined_alarms.get(alarm_nr)
         if alarm is None:
             raise AlarmNotDefinedError(alarm_nr)
@@ -107,21 +103,19 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             AlarmServer.clear(self, alarm_nr)
             self.endRemoveRows()
 
-    def clear_all(self):
-        """
-        Clear all current alarms.
-
-        """
+    def clear_all(self) -> None:
+        """Clear all current alarms."""
         self.beginResetModel()
         AlarmServer.clear_all(self)
         self.endResetModel()
 
-    def columnCount(self, index=QModelIndex()):
+    def columnCount(self, index: QModelIndex = QModelIndex()) -> int:
+        """Return column count."""
         return COLUMN_COUNT
 
-    def data(self, index, role=Qt.DisplayRole):
-        if not index.isValid() or \
-                not (0 <= index.row() < len(self.current_alarms)):
+    def data(self, index: QModelIndex, role: int = Qt.DisplayRole) -> Any:
+        """Return data."""
+        if not index.isValid() or not (0 <= index.row() < len(self.current_alarms)):
             return QVariant
 
         alarm = self.current_alarms[index.row()]
@@ -134,12 +128,15 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             elif column == ALARM_COUNTER:
                 return QVariant(alarm.counter)
             elif column == ALARM_TIME_COMING:
-                return QVariant(alarm.time_coming.strftime(TIME_PATTERN))
-            elif column == ALARM_TIME_GOING:
-                time_going = alarm.time_going
-                if time_going is None:
+                if alarm.time_coming is not None:
+                    return QVariant(alarm.time_coming.strftime(TIME_PATTERN))
+                else:
                     return QVariant()
-                return QVariant(alarm.time_going.strftime(TIME_PATTERN))
+            elif column == ALARM_TIME_GOING:
+                if alarm.time_going is not None:
+                    return QVariant(alarm.time_going.strftime(TIME_PATTERN))
+                else:
+                    return QVariant()
         elif role == Qt.TextAlignmentRole:
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.TextColorRole:
@@ -148,7 +145,10 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
             elif alarm.is_active:
                 return QVariant(QColor(Qt.red))
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
+    def headerData(
+        self, section: int, orientation: int, role: int = Qt.DisplayRole
+    ) -> Any:
+        """Return header data."""
         if role == Qt.TextAlignmentRole:
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         if role == Qt.DisplayRole:
@@ -169,5 +169,6 @@ class AlarmServerModel(QAbstractTableModel, AlarmServer):
                 return QVariant(section + 1)
         return QVariant()
 
-    def rowCount(self, index=QModelIndex()):
+    def rowCount(self, index: QModelIndex = QModelIndex()) -> int:
+        """Return row count."""
         return len(self.current_alarms)
