@@ -1,0 +1,3 @@
+[submodule "stubs/PyQt5"]
+	path = stubs/PyQt5
+	url = https://github.com/stlehmann/PyQt5_stubs
