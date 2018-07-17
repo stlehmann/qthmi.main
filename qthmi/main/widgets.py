@@ -5,7 +5,7 @@
 
 :created on 2018-06-11 18:16:58
 :last modified by: Stefan Lehmann
-:last modified time: 2018-07-17 15:53:04
+:last modified time: 2018-07-17 16:00:02
 
 """
 from typing import Any, Dict
@@ -52,7 +52,7 @@ class HMIObject(QObject):
 class HMIWidget(HMIObject, QWidget):
     """Basic HMI Widget class."""
 
-    def __init__(self, tag: Tag, parent: QWidget = None) -> None:
+    def __init__(self, tag: Tag=None, parent: QWidget = None) -> None:
         HMIObject.__init__(self, tag, parent)
         QWidget.__init__(self, parent)
 
@@ -60,7 +60,7 @@ class HMIWidget(HMIObject, QWidget):
 class HMISpinBox(QSpinBox, HMIObject):
     """SpinBox for reading and writing a tag value."""
 
-    def __init__(self, tag: Tag, parent: QWidget=None) -> None:
+    def __init__(self, tag: Tag=None, parent: QWidget=None) -> None:
         HMIObject.__init__(self, tag, parent)
 
         self.lineEdit().installEventFilter(self)
@@ -98,7 +98,7 @@ class HMISpinBox(QSpinBox, HMIObject):
 class HMIDoubleSpinBox(QDoubleSpinBox, HMIObject):
     """DoubleSpinBox for reading and writing a tag value."""
 
-    def __init__(self, tag: Tag, parent: QWidget = None) -> None:
+    def __init__(self, tag: Tag=None, parent: QWidget = None) -> None:
         HMIObject.__init__(self, tag, parent)
 
         self.lineEdit().installEventFilter(self)
@@ -137,7 +137,7 @@ class HMIDoubleSpinBox(QDoubleSpinBox, HMIObject):
 class HMIComboBox(QComboBox, HMIObject):
     """ComboBox for reading and writing a tag value."""
 
-    def __init__(self, tag: Tag, parent: QWidget = None) -> None:
+    def __init__(self, tag: Tag=None, parent: QWidget = None) -> None:
         HMIObject.__init__(self, tag, parent)
 
         if self.tag is not None:
@@ -164,9 +164,9 @@ class HMILabel(QLabel, HMIObject):
     """Label for reading from a tag value."""
 
     def __init__(
-        self, tag: Tag, parent: QWidget = None, format_spec: str = "{:03.3f}"
+        self, tag: Tag=None, parent: QWidget = None, format_spec: str = "{:03.3f}"
     ) -> None:
-        super(HMILabel, self).__init__(tag, parent)
+        HMIObject.__init__(self, tag, parent)
         self.format_spec = format_spec
         if self.tag is not None:
             self.tag.value_changed.connect(self.read_value_from_tag)
@@ -181,8 +181,8 @@ class HMILabel(QLabel, HMIObject):
 class HMILineEdit(QLineEdit, HMIObject):
     """LineEdit for reading and writing a tag value."""
 
-    def __init__(self, tag: Tag, parent: QWidget=None) -> None:
-        super(HMILineEdit, self).__init__(tag, parent)
+    def __init__(self, tag: Tag=None, parent: QWidget=None) -> None:
+        HMIObject.__init__(self, tag, parent)
 
         if self.tag is not None:
             self.tag.value_changed.connect(self.read_value_from_tag)
@@ -202,8 +202,8 @@ class HMILineEdit(QLineEdit, HMIObject):
 class HMIPushButton(QPushButton, HMIObject):
     """PushButton for reading and writing a tag value."""
 
-    def __init__(self, tag: Tag, parent: QWidget=None) -> None:
-        super(HMIPushButton, self).__init__(tag, parent)
+    def __init__(self, tag: Tag=None, parent: QWidget=None) -> None:
+        HMIObject.__init__(self, tag, parent)
 
         QPushButton.setCheckable(self, True)
 
@@ -244,8 +244,9 @@ class HMITextMapper(HMIObject):
 
     """
 
-    def __init__(self, tag: Tag, parent: QWidget=None) -> None:
-        super(HMITextMapper, self).__init__(tag, parent)
+    def __init__(self, tag: Tag=None, parent: QWidget=None) -> None:
+        HMIObject.__init__(self, tag, parent)
+
         self.text_definitions: Dict[Any, str] = {}
         self.text = ""
         if self.tag is not None:
@@ -281,7 +282,7 @@ class HMITextMapper(HMIObject):
 class HMIIndicator(QWidget, HMIObject):
     """Indicator light to display state of a bool tag."""
 
-    def __init__(self, tag: Tag, parent: QWidget=None) -> None:
+    def __init__(self, tag: Tag=None, parent: QWidget=None) -> None:
         HMIObject.__init__(self, tag, parent)
         if self.tag is not None:
             self.tag.value_changed.connect(self.read_value_from_tag)
@@ -328,8 +329,9 @@ class HMIIndicator(QWidget, HMIObject):
 class HMICheckBox(QCheckBox, HMIObject):
     """Checkbox for displaying and switching a boolean tag."""
 
-    def __init__(self, tag: Tag, parent: QWidget=None) -> None:
-        super(HMICheckBox, self).__init__(tag, parent)
+    def __init__(self, tag: Tag=None, parent: QWidget=None) -> None:
+        HMIObject.__init__(self, tag, parent)
+
         if self.tag is not None:
             self.tag.value_changed.connect(self.read_value_from_tag)
             self.stateChanged.connect(self.write_value_to_tag)
