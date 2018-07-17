@@ -4,8 +4,8 @@
 :license: MIT, see license file or https://opensource.org/licenses/MIT
 
 :created on 2018-06-11 18:16:58
-:last modified by:   Stefan Lehmann
-:last modified time: 2018-07-10 09:50:41
+:last modified by: Stefan Lehmann
+:last modified time: 2018-07-17 16:47:19
 
 Provides an AlarmServer class which is able to handle
 alarms. It is intended for HMI software where alarm handling is often
@@ -238,7 +238,8 @@ class AlarmWord(HMIObject):
         self.alarmserver = alarmserver
         self.offset = offset
 
-        self.tag.value_changed.connect(self.read_value_from_tag)
+        if self.tag is not None:
+            self.tag.value_changed.connect(self.read_value_from_tag)
 
     def check(self) -> None:
         """Check alarm word for active alarms identified by their bit number.
@@ -270,7 +271,8 @@ class AlarmWord(HMIObject):
 
     def read_value_from_tag(self) -> None:
         """Read value from the tag."""
-        self.value = self.tag.value
+        if self.tag is not None:
+            self.value = self.tag.value
 
     def write_value_to_tag(self) -> None:
         """Write value to the tag."""
@@ -283,7 +285,8 @@ class HMIAckWord(HMIObject):
     def __init__(self, tag: Tag) -> None:
         HMIObject.__init__(self, tag)
         self._value = 0
-        self.tag.value_changed.connect(self.read_value_from_tag)
+        if self.tag is not None:
+            self.tag.value_changed.connect(self.read_value_from_tag)
 
     @property
     def value(self) -> int:
@@ -297,11 +300,13 @@ class HMIAckWord(HMIObject):
 
     def read_value_from_tag(self) -> None:
         """Read value from tag."""
-        self.value = self.tag.value
+        if self.tag is not None:
+            self.value = self.tag.value
 
     def write_value_to_tag(self) -> None:
         """Write value to tag."""
-        self.tag.value = self.value
+        if self.tag is not None:
+            self.tag.value = self.value
 
     def set_bit(self, n: int) -> None:
         """Set one bit.
