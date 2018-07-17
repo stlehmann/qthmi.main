@@ -4,8 +4,8 @@
 :license: MIT, see license file or https://opensource.org/licenses/MIT
 
 :created on 2018-06-11 18:16:58
-:last modified by:   Stefan Lehmann
-:last modified time: 2018-07-10 13:50:21
+:last modified by: Stefan Lehmann
+:last modified time: 2018-07-17 16:19:41
 
 """
 from PyQt5.QtCore import QSignalMapper, pyqtSlot
@@ -70,13 +70,13 @@ class NumPad(QDialog, Ui_numPad):
         self.signal_mapper.mapped[str].connect(self.button_pressed)  # type: ignore
         self.buttonOK.pressed.connect(self.accept)
         self.buttonCancel.pressed.connect(self.close)
-        self.outputLineEdit.focusOutEvent = self.outputLineEdit_focusOutEvent
+        self.outputLineEdit.focusOutEvent = self.focusOutEvent
 
         doubleValidator = QDoubleValidator()
         self.outputLineEdit.setValidator(doubleValidator)
 
-    @pyqtSlot(int)
-    def button_pressed(self, value: int) -> None:
+    @pyqtSlot(str)
+    def button_pressed(self, value: str) -> None:
         """Handle a pressed button."""
         cursor_position = self.outputLineEdit.cursorPosition()
 
